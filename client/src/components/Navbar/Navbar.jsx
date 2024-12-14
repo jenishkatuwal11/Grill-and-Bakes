@@ -8,7 +8,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="relative flex items-center justify-between px-4 md:px-6 py-4 shadow-md bg-light-beige">
+    <nav className=" sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 shadow-md bg-light-beige">
       {/* Logo and Brand */}
       <div className="flex items-center space-x-3">
         <img
