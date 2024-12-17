@@ -1,10 +1,8 @@
-import Navbar from "./components/Navbar/Navbar";
-import Footer from "./components/Footer/Footer";
+import HomePage from "./pages/Home/homepage";
 const App = () => {
   return (
     <>
-      <Navbar />
-      <Footer />
+      <HomePage />
     </>
   );
 };

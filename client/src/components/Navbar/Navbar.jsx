@@ -8,13 +8,16 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className=" sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 shadow-md bg-light-beige">
+    <nav
+      className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 shadow-md  "
+      style={{ backgroundColor: "#F5F5DC" }}
+    >
       {/* Logo and Brand */}
       <div className="flex items-center space-x-3">
         <img
           src={assets.Mainlogo}
           alt="LogoImage"
-          className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16"
+          className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-transparent"
         />
         <div className="text-lg sm:text-xl md:text-3xl font-bold text-maroon">
           <div style={{ marginBottom: "-6px" }}>Grill & Bakes</div>
@@ -28,7 +31,7 @@ const Navbar = () => {
       <div className="hidden lg:flex items-center space-x-6">
         <ul className="hidden md:flex space-x-6 lg:space-x-8 text-dark-brown">
           <li className="hover:text-maroon cursor-pointer">Home</li>
-          <li className="hover:text-maroon cursor-pointer">Menu</li>
+          <li className="hover:text-maroon cursor-pointer">Your Drink</li>
           <li className="hover:text-maroon cursor-pointer">Mobile app</li>
           <li className="hover:text-maroon cursor-pointer">Contact Us</li>
         </ul>
@@ -38,7 +41,7 @@ const Navbar = () => {
           <input
             type="text"
             placeholder="Search"
-            className="w-full outline-none text-dark-brown placeholder-dark-brown text-sm lg:text-base"
+            className="w-full outline-none text-dark-brown placeholder-dark-brown text-sm lg:text-base bg-transparent"
           />
           <button>
             <IoIosSearch className="text-maroon w-6 h-6 lg:w-7 lg:h-10 ml-2 lg:ml-4" />
@@ -70,13 +73,14 @@ const Navbar = () => {
         className={`absolute top-[100%] right-4 bg-light-beige shadow-lg rounded-lg w-48 ${
           isMenuOpen ? "block" : "hidden"
         } lg:hidden`}
+        style={{ backgroundColor: "#F5F5DC" }}
       >
         <ul className="flex flex-col items-start p-4 space-y-2 text-dark-brown">
           <li className="hover:text-maroon cursor-pointer w-full text-left">
             Home
           </li>
           <li className="hover:text-maroon cursor-pointer w-full text-left">
-            Menu
+            Your Drink
           </li>
           <li className="hover:text-maroon cursor-pointer w-full text-left">
             Mobile app
