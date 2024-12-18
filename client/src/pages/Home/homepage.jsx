@@ -1,21 +1,58 @@
 import { useState, useEffect } from "react";
+import Slider from "react-slick";
 import assets from "../../assets/assets"; // Ensure correct paths for your images
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 
 const HomePage = () => {
-  // const handleCategoryClick = (category) => {
-  //   console.log(`${category} clicked`);
-  // };
-
   const [fadeIn, setFadeIn] = useState(false);
+
   useEffect(() => {
     // Trigger fade-in effect after the component mounts
     const timer = setTimeout(() => {
       setFadeIn(true);
-    }, 100); // Slight delay to ensure smooth effect
-    return () => clearTimeout(timer); // Clean up timer
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
+
+  // Slider settings
+  const sliderSettings = {
+    dots: false,
+    infinite: false, // Stop infinite scrolling
+    speed: 500, // Smooth slide transition
+    slidesToShow: 8, // Default for large screens
+    slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 1024, // Medium screens
+        settings: {
+          slidesToShow: 4,
+          slidesToScroll: 2,
+        },
+      },
+      {
+        breakpoint: 768, // Small screens
+        settings: {
+          slidesToShow: 4,
+          slidesToScroll: 3,
+        },
+      },
+      {
+        breakpoint: 480, // Extra small screens
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 2,
+        },
+      },
+    ],
+  };
+
+  // Handle click events for images
+  const handleCategoryClick = (category) => {
+    console.log(`${category} clicked`);
+    // Placeholder for navigation to category-specific dishes
+  };
+
   return (
     <>
       <Navbar />
@@ -25,17 +62,13 @@ const HomePage = () => {
         className="relative z-10 bg-cover bg-center py-20 md:py-28 lg:py-32 px-6 md:px-16 lg:px-32 rounded-3xl max-w-7xl mx-auto mt-8"
         style={{ backgroundImage: `url(${assets.HeaderImg})` }}
       >
-        {/* Overlay for better text visibility */}
         <div className="absolute inset-0 bg-black bg-opacity-20 z-0"></div>
-
-        {/* Content Container */}
         <div
           className={`relative z-10 flex flex-col md:flex-row items-center justify-between max-w-6xl mx-auto transition-opacity duration-[3000ms] ease-in-out ${
             fadeIn ? "opacity-100" : "opacity-0"
           }`}
         >
-          {/* Text Content */}
-          <div className="max-w-lg md:w-1/2 text-center md:text-left transition-opacity">
+          <div className="max-w-lg md:w-1/2 text-center md:text-left">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
               Order your favourite food here
             </h1>
@@ -64,8 +97,8 @@ const HomePage = () => {
             experience, one delicious meal at a time.
           </p>
 
-          {/* Menu Categories */}
-          <div className="flex flex-wrap justify-center gap-6">
+          {/* Slider */}
+          <Slider {...sliderSettings}>
             {[
               { name: "Salad", img: assets.salad },
               { name: "Rolls", img: assets.rolls },
@@ -75,26 +108,34 @@ const HomePage = () => {
               { name: "Pure Veg", img: assets.veg },
               { name: "Pasta", img: assets.pasta },
               { name: "Noodles", img: assets.noddles },
+              { name: "Coffee", img: assets.coffee },
+              { name: "pizza", img: assets.pizza },
+              { name: "Hot Soup", img: assets.soup },
             ].map((item, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center text-center w-28 md:w-32 cursor-pointer"
+                className="flex flex-col items-center text-center px-2 cursor-pointer"
+                onClick={() => handleCategoryClick(item.name)}
               >
                 <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden shadow-lg">
                   <img
-                    src={item.img} // Replace with category image
+                    src={item.img}
                     alt={item.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <p className="mt-2 text-dark-brown text-sm md:text-base font-medium">
+                <p className="mt-2 text-dark-brown text-sm md:text-base font-medium mr-8 md:mr-8 sm:mr-8">
                   {item.name}
                 </p>
               </div>
             ))}
-          </div>
+          </Slider>
         </div>
       </section>
+      {/* Horizontal Line Below the Item Section */}
+      <div className="mt-8 mb-12 flex justify-center items-center">
+        <hr className="w-3/4 h-1 rounded-full bg-gradient-to-r from-maroon to-dark-brown border-0" />
+      </div>
 
       <Footer />
     </>
