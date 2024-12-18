@@ -9,6 +9,9 @@ import veg from "./pureveg.jpg";
 import rolls from "./Rolls.jpg";
 import salad from "./salad.jpg";
 import sandwich from "./sandwich.jpg";
+import coffee from "./coffee.jpg";
+import pizza from "./pizza.jpg";
+import soup from "./soup.jpg";
 
 const assests = {
   Mainlogo,
@@ -22,6 +25,9 @@ const assests = {
   rolls,
   salad,
   sandwich,
+  coffee,
+  pizza,
+  soup,
 };
 
 export default assests;
