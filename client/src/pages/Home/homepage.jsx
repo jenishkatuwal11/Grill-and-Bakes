@@ -3,8 +3,14 @@ import Slider from "react-slick";
 import assets from "../../assets/assets"; // Ensure correct paths for your images
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
+import Login from "../Login/login";
 
 const HomePage = () => {
+  const [isLoginOpen, setLoginOpen] = useState(false);
+
+  const toggleLoginModal = () => {
+    setLoginOpen(!isLoginOpen);
+  };
   const [fadeIn, setFadeIn] = useState(false);
 
   useEffect(() => {
@@ -55,11 +61,12 @@ const HomePage = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar toggleLoginModal={toggleLoginModal} />
+      <Login isOpen={isLoginOpen} onClose={toggleLoginModal} />
 
       {/* Hero Section */}
       <section
-        className="relative z-10 bg-cover bg-center py-20 md:py-28 lg:py-32 px-6 md:px-16 lg:px-32 rounded-3xl max-w-7xl mx-auto mt-8"
+        className="relative z-10 bg-cover bg-center py-20 md:py-28 lg:py-32 px-6 md:px-16 lg:px-32 rounded-3xl max-w-7xl mx-auto mt-8 bg-transparent"
         style={{ backgroundImage: `url(${assets.HeaderImg})` }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-20 z-0"></div>

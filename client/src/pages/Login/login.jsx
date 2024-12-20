@@ -1,0 +1,142 @@
+import { useState } from "react";
+import PropTypes from "prop-types";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+const Login = ({ isOpen, onClose }) => {
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newErrors = {};
+    if (!formData.username.trim()) {
+      newErrors.username = "This field is required.";
+    }
+    if (!formData.password.trim()) {
+      newErrors.password = "This field is required.";
+    }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+    } else {
+      setErrors({});
+      console.log("Form Submitted", formData);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: "" });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white w-11/12 max-w-md p-6 rounded-lg shadow-lg relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition duration-300"
+        >
+          &times;
+        </button>
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
+          Login
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-600"
+            >
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Enter your username"
+              className={`mt-1 block w-full px-4 py-2 text-gray-800 bg-gray-50 border ${
+                errors.username
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-maroon"
+              } rounded-lg shadow-sm focus:outline-none focus:ring-2 ${
+                errors.username ? "focus:ring-red-500" : "focus:ring-maroon"
+              }`}
+            />
+            {errors.username && (
+              <p className="mt-1 text-sm text-red-500 flex items-center">
+                <span className="mr-2 text-lg">❗</span>
+                {errors.username}
+              </p>
+            )}
+          </div>
+          <div className="relative">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-600"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                className={`mt-1 block w-full px-4 py-2 text-gray-800 bg-gray-50 border ${
+                  errors.password
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-maroon"
+                } rounded-lg shadow-sm focus:outline-none focus:ring-2 ${
+                  errors.password ? "focus:ring-red-500" : "focus:ring-maroon"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-maroon focus:outline-none"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-500 flex items-center">
+                <span className="mr-2 text-lg">❗</span>
+                {errors.password}
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full px-4 py-2 text-white bg-maroon rounded-lg hover:bg-dark-brown transition duration-300"
+          >
+            Login
+          </button>
+        </form>
+        <div className="text-center mt-6 text-sm text-gray-600">
+          Not a Member?{" "}
+          <a
+            href="#"
+            className="text-maroon hover:underline hover:text-dark-brown transition"
+          >
+            Signup
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+Login.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
+
+export default Login;

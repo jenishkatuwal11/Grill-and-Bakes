@@ -1,15 +1,16 @@
+import PropTypes from "prop-types";
 import { useState } from "react";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { FaBars } from "react-icons/fa";
 import assets from "../../assets/assets";
 
-const Navbar = () => {
+const Navbar = ({ toggleLoginModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <nav
-      className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 shadow-md  "
+      className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 shadow-md"
       style={{ backgroundColor: "#F5F5DC" }}
     >
       {/* Logo and Brand */}
@@ -55,7 +56,10 @@ const Navbar = () => {
         <IoFastFoodOutline className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-maroon hover:text-black cursor-pointer" />
 
         {/* Sign In Button */}
-        <button className="px-3 py-1 sm:px-4 sm:py-1 md:px-5 md:py-2 border rounded-full text-dark-brown border-maroon hover:bg-maroon hover:text-light-beige text-sm sm:text-base md:text-lg">
+        <button
+          className="px-3 py-1 sm:px-4 sm:py-1 md:px-5 md:py-2 border rounded-full text-dark-brown border-maroon hover:bg-maroon hover:text-light-beige text-sm sm:text-base md:text-lg"
+          onClick={toggleLoginModal} // Trigger Login Modal
+        >
           Sign in
         </button>
 
@@ -73,9 +77,9 @@ const Navbar = () => {
         className={`absolute top-[100%] right-4 bg-light-beige shadow-lg rounded-lg w-48 ${
           isMenuOpen ? "block" : "hidden"
         } lg:hidden`}
-        style={{ backgroundColor: "#F5F5DC" }}
+        style={{ backgroundColor: "#F5F5DC", padding: "0.5rem 1rem" }}
       >
-        <ul className="flex flex-col items-start p-4 space-y-2 text-dark-brown">
+        <ul className="flex flex-col items-start p-2 space-y-2 text-dark-brown">
           <li className="hover:text-maroon cursor-pointer w-full text-left">
             Home
           </li>
@@ -92,6 +96,10 @@ const Navbar = () => {
       </div>
     </nav>
   );
+};
+
+Navbar.propTypes = {
+  toggleLoginModal: PropTypes.func.isRequired, // Must be a function and is required
 };
 
 export default Navbar;
