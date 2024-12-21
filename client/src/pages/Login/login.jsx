@@ -2,7 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const Login = ({ isOpen, onClose }) => {
+const Login = ({ isOpen, onClose, switchMode }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
@@ -23,6 +23,7 @@ const Login = ({ isOpen, onClose }) => {
     } else {
       setErrors({});
       console.log("Form Submitted", formData);
+      // Add further login logic here
     }
   };
 
@@ -35,16 +36,20 @@ const Login = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white w-11/12 max-w-md p-6 rounded-lg shadow-lg relative">
+        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition duration-300"
         >
           &times;
         </button>
+        {/* Title */}
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
           Login
         </h2>
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Username Field */}
           <div>
             <label
               htmlFor="username"
@@ -69,11 +74,12 @@ const Login = ({ isOpen, onClose }) => {
             />
             {errors.username && (
               <p className="mt-1 text-sm text-red-500 flex items-center">
-                <span className="mr-2 text-lg">❗</span>
+                <span className="mr-2 text-sm">❗</span>
                 {errors.username}
               </p>
             )}
           </div>
+          {/* Password Field */}
           <div className="relative">
             <label
               htmlFor="password"
@@ -97,6 +103,7 @@ const Login = ({ isOpen, onClose }) => {
                   errors.password ? "focus:ring-red-500" : "focus:ring-maroon"
                 }`}
               />
+              {/* Show/Hide Password Button */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -107,12 +114,12 @@ const Login = ({ isOpen, onClose }) => {
             </div>
             {errors.password && (
               <p className="mt-1 text-sm text-red-500 flex items-center">
-                <span className="mr-2 text-lg">❗</span>
+                <span className="mr-2 text-sm">❗</span>
                 {errors.password}
               </p>
             )}
           </div>
-
+          {/* Submit Button */}
           <button
             type="submit"
             className="w-full px-4 py-2 text-white bg-maroon rounded-lg hover:bg-dark-brown transition duration-300"
@@ -120,14 +127,15 @@ const Login = ({ isOpen, onClose }) => {
             Login
           </button>
         </form>
+        {/* Footer */}
         <div className="text-center mt-6 text-sm text-gray-600">
-          Not a Member?{" "}
-          <a
-            href="#"
-            className="text-maroon hover:underline hover:text-dark-brown transition"
+          Dont have an account?{" "}
+          <span
+            onClick={switchMode}
+            className="text-maroon hover:underline hover:text-dark-brown transition cursor-pointer"
           >
-            Signup
-          </a>
+            Register
+          </span>
         </div>
       </div>
     </div>
@@ -137,6 +145,7 @@ const Login = ({ isOpen, onClose }) => {
 Login.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  switchMode: PropTypes.func.isRequired, // Required for toggling between Login and Register modals
 };
 
 export default Login;

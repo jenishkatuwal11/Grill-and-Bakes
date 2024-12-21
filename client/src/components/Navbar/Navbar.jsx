@@ -1,5 +1,5 @@
-import PropTypes from "prop-types";
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { FaBars } from "react-icons/fa";
@@ -33,7 +33,7 @@ const Navbar = ({ toggleLoginModal }) => {
         <ul className="hidden md:flex space-x-6 lg:space-x-8 text-dark-brown">
           <li className="hover:text-maroon cursor-pointer">Home</li>
           <li className="hover:text-maroon cursor-pointer">Your Drink</li>
-          <li className="hover:text-maroon cursor-pointer">Mobile app</li>
+          <li className="hover:text-maroon cursor-pointer">Mobile App</li>
           <li className="hover:text-maroon cursor-pointer">Contact Us</li>
         </ul>
 
@@ -58,9 +58,9 @@ const Navbar = ({ toggleLoginModal }) => {
         {/* Sign In Button */}
         <button
           className="px-3 py-1 sm:px-4 sm:py-1 md:px-5 md:py-2 border rounded-full text-dark-brown border-maroon hover:bg-maroon hover:text-light-beige text-sm sm:text-base md:text-lg"
-          onClick={toggleLoginModal} // Trigger Login Modal
+          onClick={toggleLoginModal} // Single trigger for Login Modal
         >
-          Sign in
+          Sign In
         </button>
 
         {/* Hamburger Menu for Small Screens */}
@@ -73,33 +73,33 @@ const Navbar = ({ toggleLoginModal }) => {
       </div>
 
       {/* Dropdown Menu for Hamburger */}
-      <div
-        className={`absolute top-[100%] right-4 bg-light-beige shadow-lg rounded-lg w-48 ${
-          isMenuOpen ? "block" : "hidden"
-        } lg:hidden`}
-        style={{ backgroundColor: "#F5F5DC", padding: "0.5rem 1rem" }}
-      >
-        <ul className="flex flex-col items-start p-2 space-y-2 text-dark-brown">
-          <li className="hover:text-maroon cursor-pointer w-full text-left">
-            Home
-          </li>
-          <li className="hover:text-maroon cursor-pointer w-full text-left">
-            Your Drink
-          </li>
-          <li className="hover:text-maroon cursor-pointer w-full text-left">
-            Mobile app
-          </li>
-          <li className="hover:text-maroon cursor-pointer w-full text-left">
-            Contact Us
-          </li>
-        </ul>
-      </div>
+      {isMenuOpen && (
+        <div
+          className="absolute top-[100%] right-4 bg-light-beige shadow-lg rounded-lg w-48 lg:hidden"
+          style={{ backgroundColor: "#F5F5DC", padding: "0.5rem 1rem" }}
+        >
+          <ul className="flex flex-col items-start p-2 space-y-2 text-dark-brown">
+            <li className="hover:text-maroon cursor-pointer w-full text-left">
+              Home
+            </li>
+            <li className="hover:text-maroon cursor-pointer w-full text-left">
+              Your Drink
+            </li>
+            <li className="hover:text-maroon cursor-pointer w-full text-left">
+              Mobile App
+            </li>
+            <li className="hover:text-maroon cursor-pointer w-full text-left">
+              Contact Us
+            </li>
+          </ul>
+        </div>
+      )}
     </nav>
   );
 };
 
 Navbar.propTypes = {
-  toggleLoginModal: PropTypes.func.isRequired, // Must be a function and is required
+  toggleLoginModal: PropTypes.func.isRequired, // Prop for triggering the Login Modal
 };
 
 export default Navbar;
