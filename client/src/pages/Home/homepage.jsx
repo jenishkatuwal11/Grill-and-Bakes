@@ -4,66 +4,68 @@ import assets from "../../assets/assets"; // Ensure correct paths for your image
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import Login from "../Login/login";
+import Register from "../Register/register";
 
 const HomePage = () => {
   const [isLoginOpen, setLoginOpen] = useState(false);
+  const [isRegisterOpen, setRegisterOpen] = useState(false); // Optional for Register
+  const [fadeIn, setFadeIn] = useState(false);
 
   const toggleLoginModal = () => {
     setLoginOpen(!isLoginOpen);
   };
-  const [fadeIn, setFadeIn] = useState(false);
+
+  const toggleRegisterModal = () => {
+    setRegisterOpen(!isRegisterOpen);
+  };
+
+  const switchToRegister = () => {
+    setLoginOpen(false);
+    setRegisterOpen(true);
+  };
+
+  const switchToLogin = () => {
+    setRegisterOpen(false);
+    setLoginOpen(true);
+  };
 
   useEffect(() => {
-    // Trigger fade-in effect after the component mounts
     const timer = setTimeout(() => {
       setFadeIn(true);
     }, 100);
     return () => clearTimeout(timer);
   }, []);
 
-  // Slider settings
   const sliderSettings = {
     dots: false,
-    infinite: false, // Stop infinite scrolling
-    speed: 500, // Smooth slide transition
-    slidesToShow: 8, // Default for large screens
+    infinite: false,
+    speed: 500,
+    slidesToShow: 8,
     slidesToScroll: 1,
     responsive: [
-      {
-        breakpoint: 1024, // Medium screens
-        settings: {
-          slidesToShow: 4,
-          slidesToScroll: 2,
-        },
-      },
-      {
-        breakpoint: 768, // Small screens
-        settings: {
-          slidesToShow: 4,
-          slidesToScroll: 3,
-        },
-      },
-      {
-        breakpoint: 480, // Extra small screens
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 2,
-        },
-      },
+      { breakpoint: 1024, settings: { slidesToShow: 4, slidesToScroll: 2 } },
+      { breakpoint: 768, settings: { slidesToShow: 4, slidesToScroll: 3 } },
+      { breakpoint: 480, settings: { slidesToShow: 3, slidesToScroll: 2 } },
     ],
   };
 
-  // Handle click events for images
   const handleCategoryClick = (category) => {
     console.log(`${category} clicked`);
-    // Placeholder for navigation to category-specific dishes
   };
 
   return (
     <>
       <Navbar toggleLoginModal={toggleLoginModal} />
-      <Login isOpen={isLoginOpen} onClose={toggleLoginModal} />
-
+      <Login
+        isOpen={isLoginOpen}
+        onClose={toggleLoginModal}
+        switchMode={switchToRegister} // Optional for switching to Register
+      />
+      <Register
+        isOpen={isRegisterOpen}
+        onClose={toggleRegisterModal}
+        switchMode={switchToLogin} // Optional for switching to Login
+      />
       {/* Hero Section */}
       <section
         className="relative z-10 bg-cover bg-center py-20 md:py-28 lg:py-32 px-6 md:px-16 lg:px-32 rounded-3xl max-w-7xl mx-auto mt-8 bg-transparent"
