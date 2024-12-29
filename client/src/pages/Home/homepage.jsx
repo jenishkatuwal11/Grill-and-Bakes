@@ -153,18 +153,47 @@ const HomePage = () => {
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {[
-              { name: "Greek Salad", price: "₹700", img: assets.Grillbasafish },
-              { name: "Veg Salad", price: "₹900", img: assets.chickenbiryani },
               {
-                name: "Clover Salad",
+                name: "Grill Basa Fish",
+                price: "₹700",
+                img: assets.Grillbasafish,
+              },
+              {
+                name: "Chicken Biryani",
+                price: "₹900",
+                img: assets.chickenbiryani,
+              },
+              {
+                name: "Chicken Parmesan",
                 price: "₹650",
                 img: assets.chickenparmesan,
               },
               {
-                name: "Chicken Salad",
+                name: "Hot Mexican Pizza",
                 price: "₹1200",
                 img: assets.mexican_Pizza,
               },
+              {
+                name: "BBQ Prawns",
+                price: "₹850",
+                img: assets.BBQPrawns,
+              },
+              {
+                name: "Bologna Pizza",
+                price: "₹1150",
+                img: assets.BolognaPizza,
+              },
+              {
+                name: "Spring Roll",
+                price: "₹280",
+                img: assets.SpringRoll,
+              },
+              {
+                name: "Mix Fruit Salad",
+                price: "₹480",
+                img: assets.FruitSalad,
+              },
+
               // Add more items here
             ].map((item, index) => (
               <div
