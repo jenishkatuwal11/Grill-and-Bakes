@@ -12,6 +12,10 @@ import sandwich from "./sandwich.jpg";
 import coffee from "./coffee.jpg";
 import pizza from "./pizza.jpg";
 import soup from "./soup.jpg";
+import chickenbiryani from "./MenuItems/chickenbiryani.jpg";
+import chickenparmesan from "./MenuItems/chickenparmesan.jpg";
+import Grillbasafish from "./MenuItems/Grillbasafish.jpg";
+import mexican_Pizza from "./MenuItems/Hotmexican_Pizza.jpg";
 
 const assests = {
   Mainlogo,
@@ -28,6 +32,10 @@ const assests = {
   coffee,
   pizza,
   soup,
+  chickenbiryani,
+  chickenparmesan,
+  Grillbasafish,
+  mexican_Pizza,
 };
 
 export default assests;

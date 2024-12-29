@@ -145,6 +145,62 @@ const HomePage = () => {
       <div className="mt-8 mb-12 flex justify-center items-center">
         <hr className="w-3/4 h-1 rounded-full bg-gradient-to-r from-maroon to-dark-brown border-0" />
       </div>
+      {/* Menu Items Section */}
+      <section className="bg-white py-12 md:py-20 px-6 md:px-16 lg:px-32">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-dark-brown mb-6">
+            Top Dishes Near You
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[
+              { name: "Greek Salad", price: "₹700", img: assets.Grillbasafish },
+              { name: "Veg Salad", price: "₹900", img: assets.chickenbiryani },
+              {
+                name: "Clover Salad",
+                price: "₹650",
+                img: assets.chickenparmesan,
+              },
+              {
+                name: "Chicken Salad",
+                price: "₹1200",
+                img: assets.mexican_Pizza,
+              },
+              // Add more items here
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-md rounded-lg overflow-hidden"
+              >
+                {/* Image Section */}
+                <div className="relative">
+                  <img
+                    src={item.img}
+                    alt={item.name}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="absolute bottom-2 right-2 flex items-center bg-white rounded-full shadow-md">
+                    <button className="w-8 h-8 text-center text-white bg-maroon rounded-full hover:bg-dark-brown transition">
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-dark-brown">
+                    {item.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Food provides essential nutrients for overall health and
+                    well-being.
+                  </p>
+                  <p className="text-lg font-bold text-maroon">{item.price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </>
