@@ -16,7 +16,10 @@ import chickenbiryani from "./MenuItems/chickenbiryani.jpg";
 import chickenparmesan from "./MenuItems/chickenparmesan.jpg";
 import Grillbasafish from "./MenuItems/Grillbasafish.jpg";
 import mexican_Pizza from "./MenuItems/Hotmexican_Pizza.jpg";
-
+import BBQPrawns from "./MenuItems/GrilledPrawns.jpg";
+import SpringRoll from "./MenuItems/SpringRolls.jpg";
+import BolognaPizza from "./MenuItems/BolognaPizza.jpg";
+import FruitSalad from "./MenuItems/FruitSalad.jpg";
 const assests = {
   Mainlogo,
   footerImg,
@@ -36,6 +39,10 @@ const assests = {
   chickenparmesan,
   Grillbasafish,
   mexican_Pizza,
+  BBQPrawns,
+  SpringRoll,
+  BolognaPizza,
+  FruitSalad,
 };
 
 export default assests;
