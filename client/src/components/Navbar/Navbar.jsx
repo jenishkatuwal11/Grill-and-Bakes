@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
@@ -31,10 +32,26 @@ const Navbar = ({ toggleLoginModal }) => {
       {/* Links and Search Bar */}
       <div className="hidden lg:flex items-center space-x-6">
         <ul className="hidden md:flex space-x-6 lg:space-x-8 text-dark-brown">
-          <li className="hover:text-maroon cursor-pointer">Home</li>
+          <li>
+            {" "}
+            <Link to="/" className="hover:text-maroon cursor-pointer">
+              Home
+            </Link>
+          </li>
           <li className="hover:text-maroon cursor-pointer">Your Drink</li>
-          <li className="hover:text-maroon cursor-pointer">Mobile App</li>
-          <li className="hover:text-maroon cursor-pointer">Contact Us</li>
+          <li>
+            {" "}
+            <Link to="/mobile-app" className="hover:text-maroon cursor-pointer">
+              Mobile App
+            </Link>
+          </li>
+          <li>
+            {" "}
+            <Link to="/contact-us" className="hover:text-maroon cursor-pointer">
+              {" "}
+              Contact Us
+            </Link>
+          </li>
         </ul>
 
         {/* Search Bar */}

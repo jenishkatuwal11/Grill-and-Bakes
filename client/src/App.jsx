@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/Home/homepage";
 import Login from "./pages/Login/login";
 import Register from "./pages/Register/register";
+import MobileApp from "./pages/Mobile_App/mobileApp";
+import ContactUs from "./pages/ContactUs/contactUs";
 
 const App = () => {
   // State to manage modal visibility
@@ -20,20 +23,33 @@ const App = () => {
   };
 
   return (
-    <>
-      {/* Pass the function to toggle Login modal */}
-      <HomePage toggleLoginModal={() => setIsLoginOpen(true)} />
-      <Login
-        isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
-        switchMode={switchToRegister} // Switch to Register modal
-      />
-      <Register
-        isOpen={isRegisterOpen}
-        onClose={() => setIsRegisterOpen(false)}
-        switchMode={switchToLogin} // Switch to Login modal
-      />
-    </>
+    <Router>
+      {/* Modals */}
+      {isLoginOpen && (
+        <Login
+          isOpen={isLoginOpen}
+          onClose={() => setIsLoginOpen(false)}
+          switchMode={switchToRegister} // Switch to Register modal
+        />
+      )}
+      {isRegisterOpen && (
+        <Register
+          isOpen={isRegisterOpen}
+          onClose={() => setIsRegisterOpen(false)}
+          switchMode={switchToLogin} // Switch to Login modal
+        />
+      )}
+
+      {/* Routes */}
+      <Routes>
+        <Route
+          path="/"
+          element={<HomePage toggleLoginModal={() => setIsLoginOpen(true)} />}
+        />
+        <Route path="/mobile-app" element={<MobileApp />} />
+        <Route path="/contact-us" element={<ContactUs />} />
+      </Routes>
+    </Router>
   );
 };
 
