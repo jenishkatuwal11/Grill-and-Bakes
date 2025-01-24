@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Slider from "react-slick";
+import { FaPlus, FaMinus, FaTimes } from "react-icons/fa";
 import assets from "../../assets/assets"; // Ensure correct paths for your images
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
@@ -10,6 +11,28 @@ const HomePage = () => {
   const [isLoginOpen, setLoginOpen] = useState(false);
   const [isRegisterOpen, setRegisterOpen] = useState(false); // Optional for Register
   const [fadeIn, setFadeIn] = useState(false);
+  const [itemQuantities, setItemQuantities] = useState({}); // Track quantities of each item
+
+  const handleIncrease = (itemName) => {
+    setItemQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [itemName]: (prevQuantities[itemName] || 0) + 1,
+    }));
+  };
+
+  const handleDecrease = (itemName) => {
+    setItemQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [itemName]: Math.max((prevQuantities[itemName] || 0) - 1, 0),
+    }));
+  };
+
+  const handleReset = (itemName) => {
+    setItemQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [itemName]: 0,
+    }));
+  };
 
   const toggleLoginModal = () => {
     setLoginOpen(!isLoginOpen);
@@ -145,6 +168,7 @@ const HomePage = () => {
       <div className="mt-8 mb-12 flex justify-center items-center">
         <hr className="w-3/4 h-1 rounded-full bg-gradient-to-r from-maroon to-dark-brown border-0" />
       </div>
+
       {/* Menu Items Section */}
       <section className="bg-white py-12 md:py-20 px-6 md:px-16 lg:px-32">
         <div className="max-w-7xl mx-auto">
@@ -201,6 +225,7 @@ const HomePage = () => {
                 className="bg-white shadow-md rounded-lg overflow-hidden"
               >
                 {/* Image Section */}
+                {/* Image Section */}
                 <div className="relative">
                   <img
                     src={item.img}
@@ -208,9 +233,39 @@ const HomePage = () => {
                     className="w-full h-40 object-cover"
                   />
                   <div className="absolute bottom-2 right-2 flex items-center bg-white rounded-full shadow-md">
-                    <button className="w-8 h-8 text-center text-white bg-maroon rounded-full hover:bg-dark-brown transition">
-                      +
-                    </button>
+                    {itemQuantities[item.name] !== undefined &&
+                    itemQuantities[item.name] > 0 ? (
+                      <>
+                        <button
+                          className="w-8 h-8 flex items-center justify-center text-white bg-red-500 rounded-full hover:bg-dark-brown transition"
+                          onClick={() => handleDecrease(item.name)}
+                        >
+                          <FaMinus />
+                        </button>
+                        <span className="mx-2 text-maroon font-semibold">
+                          {itemQuantities[item.name]}
+                        </span>
+                        <button
+                          className="w-8 h-8 flex items-center justify-center text-white bg-green-500 rounded-full hover:bg-dark-brown transition"
+                          onClick={() => handleIncrease(item.name)}
+                        >
+                          <FaPlus />
+                        </button>
+                        <button
+                          className="ml-2 w-8 h-8 flex items-center justify-center text-red-500 hover:text-dark-brown transition"
+                          onClick={() => handleReset(item.name)}
+                        >
+                          <FaTimes />
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        className="w-8 h-8 flex items-center justify-center text-white bg-maroon rounded-full hover:bg-dark-brown transition"
+                        onClick={() => handleIncrease(item.name)}
+                      >
+                        <FaPlus />
+                      </button>
+                    )}
                   </div>
                 </div>
 

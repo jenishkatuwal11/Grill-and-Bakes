@@ -5,6 +5,7 @@ import Login from "./pages/Login/login";
 import Register from "./pages/Register/register";
 import MobileApp from "./pages/Mobile_App/mobileApp";
 import ContactUs from "./pages/ContactUs/contactUs";
+import Cart from "./pages/Cart/Carts";
 
 const App = () => {
   // State to manage modal visibility
@@ -48,6 +49,7 @@ const App = () => {
         />
         <Route path="/mobile-app" element={<MobileApp />} />
         <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/cart" element={<Cart />} />
       </Routes>
     </Router>
   );
