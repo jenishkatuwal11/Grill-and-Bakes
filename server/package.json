@@ -7,5 +7,17 @@
   },
   "author": "Jenish Katuwal",
   "license": "ISC",
-  "description": ""
+  "description": "This is a food web application built as Final Year Project but to Grill & Bakes Family Restaurant",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
 }
