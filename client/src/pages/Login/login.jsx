@@ -1,31 +1,15 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
+import { loginUser } from "../../services/authService"; // API call for login
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import PropTypes from "prop-types";
 
 const Login = ({ isOpen, onClose, switchMode }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   if (!isOpen) return null;
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    if (!formData.username.trim()) {
-      newErrors.username = "This field is required.";
-    }
-    if (!formData.password.trim()) {
-      newErrors.password = "This field is required.";
-    }
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-    } else {
-      setErrors({});
-      console.log("Form Submitted", formData);
-      // Add further login logic here
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,12 +17,49 @@ const Login = ({ isOpen, onClose, switchMode }) => {
     setErrors({ ...errors, [name]: "" });
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.username.trim()) newErrors.username = "Username is required.";
+    if (!formData.password.trim()) newErrors.password = "Password is required.";
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+    } else {
+      setErrors({});
+      try {
+        const response = await loginUser({
+          username: formData.username,
+          password: formData.password,
+        });
+        console.log("Login Response:", response); // Debugging
+        setSuccessMessage("Login successful!"); // response.data.message ||
+        setTimeout(() => {
+          onClose(); // Close the modal
+        }, 2000);
+      } catch (error) {
+        const errorMessage =
+          error.response?.data?.message || "Login failed. Please try again.";
+        setErrors({ form: errorMessage });
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white w-11/12 max-w-md p-6 rounded-lg shadow-lg relative">
         {/* Close Button */}
         <button
-          onClick={onClose}
+          onClick={() => {
+            setFormData({ username: "", password: "" }); // Reset form
+            setErrors({});
+            setSuccessMessage("");
+            onClose();
+          }}
           className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition duration-300"
         >
           &times;
@@ -47,6 +68,21 @@ const Login = ({ isOpen, onClose, switchMode }) => {
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
           Login
         </h2>
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="bg-green-100 text-green-700 p-4 rounded mb-4 text-center">
+            {successMessage}
+          </div>
+        )}
+
+        {/* Error Message */}
+        {errors.form && (
+          <div className="bg-red-100 text-red-700 p-4 rounded mb-4 text-center">
+            {errors.form}
+          </div>
+        )}
+
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Username Field */}
@@ -127,6 +163,7 @@ const Login = ({ isOpen, onClose, switchMode }) => {
             Login
           </button>
         </form>
+
         {/* Footer */}
         <div className="text-center mt-6 text-sm text-gray-600">
           Dont have an account?{" "}

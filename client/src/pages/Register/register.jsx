@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { registerUser } from "../../services/authService";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PropTypes from "prop-types";
 
@@ -12,6 +13,7 @@ const Register = ({ isOpen, onClose, switchMode }) => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   if (!isOpen) return null;
 
@@ -21,7 +23,7 @@ const Register = ({ isOpen, onClose, switchMode }) => {
       ...formData,
       [name]: value,
     });
-    setErrors({ ...errors, [name]: "" }); // Clear errors on input change
+    setErrors({ ...errors, [name]: "" });
   };
 
   const validateForm = () => {
@@ -37,23 +39,56 @@ const Register = ({ isOpen, onClose, switchMode }) => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
       setErrors({});
-      console.log("Form submitted:", formData);
-      // Add further sign-up logic here
+      try {
+        await registerUser({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        });
+        setSuccessMessage("You have successfully registered!");
+        setTimeout(() => {
+          handleClose();
+          switchMode();
+        }, 2000);
+      } catch (error) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Registration failed. Please try again.";
+        if (errorMessage.includes("Email")) {
+          setErrors({ email: errorMessage });
+        } else if (errorMessage.includes("Username")) {
+          setErrors({ username: errorMessage });
+        } else {
+          setErrors({ form: errorMessage });
+        }
+      }
     }
+  };
+
+  const handleClose = () => {
+    setFormData({
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+    setErrors({});
+    setSuccessMessage("");
+    onClose();
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white w-11/12 max-w-lg p-6 rounded-lg shadow-lg relative">
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition duration-300"
         >
           &times;
@@ -62,8 +97,13 @@ const Register = ({ isOpen, onClose, switchMode }) => {
           Sign Up
         </h2>
 
+        {successMessage && (
+          <div className="bg-green-100 text-green-700 p-4 rounded mb-4 text-center">
+            {successMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Username */}
           <div>
             <label
               htmlFor="username"
@@ -94,7 +134,6 @@ const Register = ({ isOpen, onClose, switchMode }) => {
             )}
           </div>
 
-          {/* Email */}
           <div>
             <label
               htmlFor="email"
@@ -125,7 +164,6 @@ const Register = ({ isOpen, onClose, switchMode }) => {
             )}
           </div>
 
-          {/* Password */}
           {[
             {
               label: "Password",
@@ -187,6 +225,12 @@ const Register = ({ isOpen, onClose, switchMode }) => {
             Register
           </button>
         </form>
+
+        {errors.form && (
+          <div className="bg-red-100 text-red-700 p-4 rounded mt-4 text-center">
+            {errors.form}
+          </div>
+        )}
 
         <div className="text-center mt-6 text-sm text-gray-600">
           Do you have an account?{" "}
