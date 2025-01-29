@@ -1,13 +1,25 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import PropTypes from "prop-types";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../redux/slices/authSlices";
+import { useNavigate, Link } from "react-router-dom"; // Import Link for routing
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaUserCircle } from "react-icons/fa";
+import { useState } from "react";
+import PropTypes from "prop-types";
 import assets from "../../assets/assets";
 
 const Navbar = ({ toggleLoginModal }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Hamburger menu state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // User dropdown state
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem("authToken"); // Clear token from local storage
+    navigate("/");
+  };
 
   return (
     <nav
@@ -16,11 +28,13 @@ const Navbar = ({ toggleLoginModal }) => {
     >
       {/* Logo and Brand */}
       <div className="flex items-center space-x-3">
-        <img
-          src={assets.Mainlogo}
-          alt="LogoImage"
-          className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-transparent"
-        />
+        <Link to="/">
+          <img
+            src={assets.Mainlogo}
+            alt="LogoImage"
+            className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-transparent"
+          />
+        </Link>
         <div className="text-lg sm:text-xl md:text-3xl font-bold text-maroon">
           <div style={{ marginBottom: "-6px" }}>Grill & Bakes</div>
           <span className="text-sm sm:text-md md:text-lg text-dark-brown font-cursive">
@@ -33,22 +47,22 @@ const Navbar = ({ toggleLoginModal }) => {
       <div className="hidden lg:flex items-center space-x-6">
         <ul className="hidden md:flex space-x-6 lg:space-x-8 text-dark-brown">
           <li>
-            {" "}
-            <Link to="/" className="hover:text-maroon cursor-pointer">
+            <Link to="/" className="hover:text-maroon">
               Home
             </Link>
           </li>
-          <li className="hover:text-maroon cursor-pointer">Your Drink</li>
           <li>
-            {" "}
-            <Link to="/mobile-app" className="hover:text-maroon cursor-pointer">
+            <a href="#" className="hover:text-maroon">
+              Your Drink
+            </a>
+          </li>
+          <li>
+            <Link to="/mobile-app" className="hover:text-maroon">
               Mobile App
             </Link>
           </li>
           <li>
-            {" "}
-            <Link to="/contact-us" className="hover:text-maroon cursor-pointer">
-              {" "}
+            <Link to="/contact-us" className="hover:text-maroon">
               Contact Us
             </Link>
           </li>
@@ -67,18 +81,45 @@ const Navbar = ({ toggleLoginModal }) => {
         </div>
       </div>
 
-      {/* Icons and Sign-In Button */}
+      {/* Icons and Profile/Sign In */}
       <div className="flex items-center space-x-4 lg:space-x-6">
         {/* Basket Icon */}
         <IoFastFoodOutline className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-maroon hover:text-black cursor-pointer" />
 
-        {/* Sign In Button */}
-        <button
-          className="px-3 py-1 sm:px-4 sm:py-1 md:px-5 md:py-2 border rounded-full text-dark-brown border-maroon hover:bg-maroon hover:text-light-beige text-sm sm:text-base md:text-lg"
-          onClick={toggleLoginModal} // Single trigger for Login Modal
-        >
-          Sign In
-        </button>
+        {user ? (
+          <div className="relative">
+            {/* Profile Icon */}
+            <div
+              className="flex items-center cursor-pointer"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <FaUserCircle className="text-maroon w-8 h-8 sm:w-10 sm:h-10" />
+              <span className="ml-2 text-dark-brown font-medium">
+                {user.username}
+              </span>
+            </div>
+
+            {/* Dropdown */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 bg-white shadow-md rounded-lg w-40 py-2 z-10">
+                <div className="px-4 py-2 text-gray-700">
+                  <p className="font-semibold">{user.username}</p>
+                  <p className="text-sm">{user.email}</p>
+                </div>
+                <div className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                  <button onClick={handleLogout}>Logout</button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            className="px-3 py-1 sm:px-4 sm:py-1 md:px-5 md:py-2 border rounded-full text-dark-brown border-maroon hover:bg-maroon hover:text-light-beige text-sm sm:text-base md:text-lg"
+            onClick={toggleLoginModal}
+          >
+            Sign In
+          </button>
+        )}
 
         {/* Hamburger Menu for Small Screens */}
         <button
@@ -96,17 +137,41 @@ const Navbar = ({ toggleLoginModal }) => {
           style={{ backgroundColor: "#F5F5DC", padding: "0.5rem 1rem" }}
         >
           <ul className="flex flex-col items-start p-2 space-y-2 text-dark-brown">
-            <li className="hover:text-maroon cursor-pointer w-full text-left">
-              Home
+            <li>
+              <Link
+                to="/"
+                className="hover:text-maroon w-full text-left"
+                onClick={() => setIsMenuOpen(false)} // Close menu after click
+              >
+                Home
+              </Link>
             </li>
-            <li className="hover:text-maroon cursor-pointer w-full text-left">
-              Your Drink
+            <li>
+              <a
+                href="#"
+                className="hover:text-maroon w-full text-left"
+                onClick={() => setIsMenuOpen(false)} // Close menu after click
+              >
+                Your Drink
+              </a>
             </li>
-            <li className="hover:text-maroon cursor-pointer w-full text-left">
-              Mobile App
+            <li>
+              <Link
+                to="/mobile-app"
+                className="hover:text-maroon w-full text-left"
+                onClick={() => setIsMenuOpen(false)} // Close menu after click
+              >
+                Mobile App
+              </Link>
             </li>
-            <li className="hover:text-maroon cursor-pointer w-full text-left">
-              Contact Us
+            <li>
+              <Link
+                to="/contact-us"
+                className="hover:text-maroon w-full text-left"
+                onClick={() => setIsMenuOpen(false)} // Close menu after click
+              >
+                Contact Us
+              </Link>
             </li>
           </ul>
         </div>

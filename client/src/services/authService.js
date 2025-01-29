@@ -1,5 +1,3 @@
-import axios from "axios";
-const API_URL = "http://localhost:8001/api/auth";
 import API from "./api";
 
 export const registerUser = async (userData) => {
@@ -9,9 +7,9 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, credentials);
+    const response = await API.post("/auth/login", credentials); // Using API instead of API_URL
     return response.data;
   } catch (error) {
-    throw error.response.data; // Ensure proper error is thrown
+    throw error.response?.data || { message: "An error occurred" };
   }
 };

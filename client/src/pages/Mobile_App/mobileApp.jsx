@@ -1,11 +1,9 @@
-import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import mobileAppGif from "../../assets/video/MobileApp.gif"; // Adjust the path based on your folder structure
 
 const MobileAppPage = () => {
   return (
     <>
-      <Navbar />
       <section className="flex flex-col items-center justify-center bg-gray-100 min-h-screen px-6 py-12">
         {/* GIF Section */}
         <div

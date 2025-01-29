@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux"; // Add Redux hooks
 import { loginUser } from "../../services/authService"; // API call for login
+import { setUser } from "../../redux/slices/authSlices"; // Redux action to set user
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PropTypes from "prop-types";
 
@@ -8,6 +10,7 @@ const Login = ({ isOpen, onClose, switchMode }) => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const dispatch = useDispatch(); // Initialize dispatch
 
   if (!isOpen) return null;
 
@@ -36,14 +39,23 @@ const Login = ({ isOpen, onClose, switchMode }) => {
           username: formData.username,
           password: formData.password,
         });
-        console.log("Login Response:", response); // Debugging
-        setSuccessMessage("Login successful!"); // response.data.message ||
+
+        // Set user in Redux store
+        dispatch(setUser(response.user)); // Dispatch user to Redux store
+
+        // Save token in localStorage for persistence
+        localStorage.setItem("authToken", response.token);
+
+        setSuccessMessage("Login successful!");
         setTimeout(() => {
           onClose(); // Close the modal
         }, 2000);
       } catch (error) {
         const errorMessage =
-          error.response?.data?.message || "Login failed. Please try again.";
+          error.message === "User not found"
+            ? "User does not exist. Please register first."
+            : error.response?.data?.message ||
+              "Login failed. Please try again.";
         setErrors({ form: errorMessage });
       }
     }
@@ -64,6 +76,7 @@ const Login = ({ isOpen, onClose, switchMode }) => {
         >
           &times;
         </button>
+
         {/* Title */}
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
           Login

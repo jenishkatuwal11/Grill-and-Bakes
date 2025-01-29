@@ -1,10 +1,8 @@
-import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 
 const ContactUs = () => {
   return (
     <>
-      <Navbar />
       <section className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-16 px-6">
         {/* Hero Section */}
         <div className="text-center mb-16">
