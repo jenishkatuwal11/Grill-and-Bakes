@@ -2,14 +2,9 @@ import { useState, useEffect } from "react";
 import Slider from "react-slick";
 import { FaPlus, FaMinus, FaTimes } from "react-icons/fa";
 import assets from "../../assets/assets"; // Ensure correct paths for your images
-import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
-import Login from "../Login/login";
-import Register from "../Register/register";
 
 const HomePage = () => {
-  const [isLoginOpen, setLoginOpen] = useState(false);
-  const [isRegisterOpen, setRegisterOpen] = useState(false); // Optional for Register
   const [fadeIn, setFadeIn] = useState(false);
   const [itemQuantities, setItemQuantities] = useState({}); // Track quantities of each item
 
@@ -32,24 +27,6 @@ const HomePage = () => {
       ...prevQuantities,
       [itemName]: 0,
     }));
-  };
-
-  const toggleLoginModal = () => {
-    setLoginOpen(!isLoginOpen);
-  };
-
-  const toggleRegisterModal = () => {
-    setRegisterOpen(!isRegisterOpen);
-  };
-
-  const switchToRegister = () => {
-    setLoginOpen(false);
-    setRegisterOpen(true);
-  };
-
-  const switchToLogin = () => {
-    setRegisterOpen(false);
-    setLoginOpen(true);
   };
 
   useEffect(() => {
@@ -78,17 +55,6 @@ const HomePage = () => {
 
   return (
     <>
-      <Navbar toggleLoginModal={toggleLoginModal} />
-      <Login
-        isOpen={isLoginOpen}
-        onClose={toggleLoginModal}
-        switchMode={switchToRegister} // Optional for switching to Register
-      />
-      <Register
-        isOpen={isRegisterOpen}
-        onClose={toggleRegisterModal}
-        switchMode={switchToLogin} // Optional for switching to Login
-      />
       {/* Hero Section */}
       <section
         className="relative z-10 bg-cover bg-center py-20 md:py-28 lg:py-32 px-6 md:px-16 lg:px-32 rounded-3xl max-w-7xl mx-auto mt-8 bg-transparent"
@@ -141,7 +107,7 @@ const HomePage = () => {
               { name: "Pasta", img: assets.pasta },
               { name: "Noodles", img: assets.noddles },
               { name: "Coffee", img: assets.coffee },
-              { name: "pizza", img: assets.pizza },
+              { name: "Pizza", img: assets.pizza },
               { name: "Hot Soup", img: assets.soup },
             ].map((item, index) => (
               <div
@@ -156,7 +122,7 @@ const HomePage = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <p className="mt-2 text-dark-brown text-sm md:text-base font-medium mr-8 md:mr-8 sm:mr-8">
+                <p className="mt-2 text-dark-brown text-sm md:text-base font-medium">
                   {item.name}
                 </p>
               </div>
@@ -164,7 +130,8 @@ const HomePage = () => {
           </Slider>
         </div>
       </section>
-      {/* Horizontal Line Below the Item Section */}
+
+      {/* Horizontal Line */}
       <div className="mt-8 mb-12 flex justify-center items-center">
         <hr className="w-3/4 h-1 rounded-full bg-gradient-to-r from-maroon to-dark-brown border-0" />
       </div>
@@ -197,34 +164,23 @@ const HomePage = () => {
                 price: "₹1200",
                 img: assets.mexican_Pizza,
               },
-              {
-                name: "BBQ Prawns",
-                price: "₹850",
-                img: assets.BBQPrawns,
-              },
+              { name: "BBQ Prawns", price: "₹850", img: assets.BBQPrawns },
               {
                 name: "Bologna Pizza",
                 price: "₹1150",
                 img: assets.BolognaPizza,
               },
-              {
-                name: "Spring Roll",
-                price: "₹280",
-                img: assets.SpringRoll,
-              },
+              { name: "Spring Roll", price: "₹280", img: assets.SpringRoll },
               {
                 name: "Mix Fruit Salad",
                 price: "₹480",
                 img: assets.FruitSalad,
               },
-
-              // Add more items here
             ].map((item, index) => (
               <div
                 key={index}
                 className="bg-white shadow-md rounded-lg overflow-hidden"
               >
-                {/* Image Section */}
                 {/* Image Section */}
                 <div className="relative">
                   <img

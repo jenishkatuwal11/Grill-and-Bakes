@@ -1,18 +1,29 @@
-import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState } from "react";
 import HomePage from "./pages/Home/homepage";
-import Login from "./pages/Login/login";
-import Register from "./pages/Register/register";
 import MobileApp from "./pages/Mobile_App/mobileApp";
 import ContactUs from "./pages/ContactUs/contactUs";
 import Cart from "./pages/Cart/Carts";
+import Navbar from "./components/Navbar/Navbar";
+import Login from "./pages/Login/login";
+import Register from "./pages/Register/register";
 
 const App = () => {
-  // State to manage modal visibility
+  // State for modal visibility
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
-  // Functions to switch between Login and Register modals
+  // Modal handlers
+  const toggleLoginModal = () => {
+    setIsLoginOpen(!isLoginOpen);
+    setIsRegisterOpen(false); // Ensure only one modal is open
+  };
+
+  const toggleRegisterModal = () => {
+    setIsRegisterOpen(!isRegisterOpen);
+    setIsLoginOpen(false); // Ensure only one modal is open
+  };
+
   const switchToRegister = () => {
     setIsLoginOpen(false);
     setIsRegisterOpen(true);
@@ -25,28 +36,24 @@ const App = () => {
 
   return (
     <Router>
-      {/* Modals */}
-      {isLoginOpen && (
-        <Login
-          isOpen={isLoginOpen}
-          onClose={() => setIsLoginOpen(false)}
-          switchMode={switchToRegister} // Switch to Register modal
-        />
-      )}
-      {isRegisterOpen && (
-        <Register
-          isOpen={isRegisterOpen}
-          onClose={() => setIsRegisterOpen(false)}
-          switchMode={switchToLogin} // Switch to Login modal
-        />
-      )}
+      {/* Navbar with toggleLoginModal prop */}
+      <Navbar toggleLoginModal={toggleLoginModal} />
+
+      {/* Login and Register Modals */}
+      <Login
+        isOpen={isLoginOpen}
+        onClose={toggleLoginModal}
+        switchMode={switchToRegister}
+      />
+      <Register
+        isOpen={isRegisterOpen}
+        onClose={toggleRegisterModal}
+        switchMode={switchToLogin}
+      />
 
       {/* Routes */}
       <Routes>
-        <Route
-          path="/"
-          element={<HomePage toggleLoginModal={() => setIsLoginOpen(true)} />}
-        />
+        <Route path="/" element={<HomePage />} />
         <Route path="/mobile-app" element={<MobileApp />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
