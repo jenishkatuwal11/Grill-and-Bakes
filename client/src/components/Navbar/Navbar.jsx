@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/slices/authSlices";
-import { useNavigate, Link } from "react-router-dom"; // Import Link for routing
+import { useNavigate, Link } from "react-router-dom";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { FaBars, FaUserCircle } from "react-icons/fa";
@@ -9,15 +9,16 @@ import PropTypes from "prop-types";
 import assets from "../../assets/assets";
 
 const Navbar = ({ toggleLoginModal }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Hamburger menu state
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // User dropdown state
-  const { user } = useSelector((state) => state.auth);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user } = useSelector((state) => state.auth); // Access user state from Redux
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem("authToken"); // Clear token from local storage
+    localStorage.removeItem("authToken"); // Clear token
+    setIsDropdownOpen(false); // Close dropdown
     navigate("/");
   };
 
@@ -86,6 +87,7 @@ const Navbar = ({ toggleLoginModal }) => {
         {/* Basket Icon */}
         <IoFastFoodOutline className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-maroon hover:text-black cursor-pointer" />
 
+        {/* Conditional Rendering: Profile Icon or Sign In */}
         {user ? (
           <div className="relative">
             {/* Profile Icon */}
@@ -101,10 +103,13 @@ const Navbar = ({ toggleLoginModal }) => {
 
             {/* Dropdown */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 bg-white shadow-md rounded-lg w-40 py-2 z-10">
+              <div
+                className="absolute right-0 mt-2 bg-white shadow-md rounded-lg w-56 py-2 z-10"
+                style={{ overflowWrap: "break-word", whiteSpace: "normal" }}
+              >
                 <div className="px-4 py-2 text-gray-700">
                   <p className="font-semibold">{user.username}</p>
-                  <p className="text-sm">{user.email}</p>
+                  <p className="text-sm break-words">{user.email}</p>
                 </div>
                 <div className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   <button onClick={handleLogout}>Logout</button>
@@ -113,6 +118,7 @@ const Navbar = ({ toggleLoginModal }) => {
             )}
           </div>
         ) : (
+          // Show "Sign In" button if the user is not logged in
           <button
             className="px-3 py-1 sm:px-4 sm:py-1 md:px-5 md:py-2 border rounded-full text-dark-brown border-maroon hover:bg-maroon hover:text-light-beige text-sm sm:text-base md:text-lg"
             onClick={toggleLoginModal}
