@@ -11,13 +11,14 @@ const Login = ({ isOpen, onClose, switchMode }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const dispatch = useDispatch(); // Initialize dispatch
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: "" });
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
   const validateForm = () => {
@@ -29,9 +30,11 @@ const Login = ({ isOpen, onClose, switchMode }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Start loading
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      setIsLoading(false); // Stop loading
     } else {
       setErrors({});
       try {
@@ -46,17 +49,25 @@ const Login = ({ isOpen, onClose, switchMode }) => {
         // Save token in localStorage for persistence
         localStorage.setItem("authToken", response.token);
 
+        // Display success message
         setSuccessMessage("Login successful!");
+
+        // Clear form and close modal after a delay
         setTimeout(() => {
-          onClose(); // Close the modal
-        }, 2000);
+          setFormData({ username: "", password: "" }); // Clear form data
+          setSuccessMessage(""); // Clear success message
+          onClose(); // Close modal
+        }, 1000); // Adjust delay as needed
       } catch (error) {
-        const errorMessage =
-          error.message === "User not found"
-            ? "User does not exist. Please register first."
-            : error.response?.data?.message ||
-              "Login failed. Please try again.";
-        setErrors({ form: errorMessage });
+        if (error.response?.status === 401) {
+          setErrors({ form: "Invalid username or password." });
+        } else {
+          const errorMessage =
+            error.response?.data?.message || "Login failed. Please try again.";
+          setErrors({ form: errorMessage });
+        }
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     }
   };
@@ -172,8 +183,9 @@ const Login = ({ isOpen, onClose, switchMode }) => {
           <button
             type="submit"
             className="w-full px-4 py-2 text-white bg-maroon rounded-lg hover:bg-dark-brown transition duration-300"
+            disabled={isLoading} // Disable while loading
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
 

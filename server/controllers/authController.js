@@ -11,11 +11,12 @@ const registerUser = async (req, res) => {
     const userExists = await User.findOne({ $or: [{ email }, { username }] });
 
     if (userExists) {
-      const message =
-        userExists.email === email
-          ? "Email already exists"
-          : "Username already exists";
-      return res.status(400).json({ message });
+      return res.status(400).json({
+        message:
+          userExists.email === email
+            ? "Email already exists"
+            : "Username already exists",
+      });
     }
 
     // Hash the password before saving
@@ -28,12 +29,22 @@ const registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    // Respond with the new user's details and a token
-    res.status(201).json({
-      _id: user._id,
+    // Generate token
+    const token = generateToken({
+      id: user._id,
       username: user.username,
       email: user.email,
-      token: generateToken(user._id),
+    });
+
+    // Respond with the new user's details and a token
+    res.status(201).json({
+      message: "Registration successful",
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+      token,
     });
   } catch (error) {
     console.error("Error in registerUser:", error);
@@ -58,12 +69,22 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Respond with user details and a token
-    res.status(200).json({
-      _id: user._id,
+    // Generate token
+    const token = generateToken({
+      id: user._id,
       username: user.username,
       email: user.email,
-      token: generateToken(user._id),
+    });
+
+    // Respond with user details and a token
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+      token,
     });
   } catch (error) {
     console.error("Error in loginUser:", error);
