@@ -1,4 +1,5 @@
 import API from "./api";
+import { setUser } from "../redux/slices/authSlices";
 
 // Register User
 export const registerUser = async (userData) => {
@@ -7,25 +8,55 @@ export const registerUser = async (userData) => {
 };
 
 // Login User
-export const loginUser = async (credentials) => {
+export const loginUser = async (credentials, dispatch) => {
   try {
     const response = await API.post("/auth/login", credentials); // API call to login endpoint
 
     // Extract token and user data from the response
     const { token, user } = response.data;
 
-    // Save the token in localStorage for persistence
-    localStorage.setItem("authToken", token);
+    // Check the role and store the token appropriately
+    if (user.role === "user") {
+      localStorage.setItem("userAuthToken", token);
+      localStorage.removeItem("adminAuthToken");
+    } else if (user.role === "admin") {
+      localStorage.setItem("adminAuthToken", token);
+      localStorage.removeItem("userAuthToken");
+    }
 
-    // Return the user data for further use
+    //  Dispatch user data to Redux **instantly**
+    dispatch(setUser({ user, role: user.role }));
+
     return { user, token };
   } catch (error) {
-    console.error("Error in loginUser:", error); // Log error for debugging
+    console.error("Error in loginUser:", error);
+    throw error.response?.data || { message: "An error occurred" };
+  }
+};
+// Login Admin
+export const loginAdmin = async (credentials, dispatch) => {
+  // Accept dispatch
+  try {
+    const response = await API.post("/auth/admin/login", credentials);
+
+    const { token, user } = response.data;
+
+    // Save admin token and remove user token
+    localStorage.setItem("adminAuthToken", token);
+    localStorage.removeItem("userAuthToken");
+
+    // Dispatch admin data to Redux store
+    dispatch(setUser({ user, role: "admin" }));
+
+    return { user, token };
+  } catch (error) {
+    console.error("Error in loginAdmin:", error);
     throw error.response?.data || { message: "An error occurred" };
   }
 };
 
-// Logout User (Optional)
+// Logout User/Admin
 export const logoutUser = () => {
-  localStorage.removeItem("authToken");
+  localStorage.removeItem("userAuthToken");
+  localStorage.removeItem("adminAuthToken");
 };

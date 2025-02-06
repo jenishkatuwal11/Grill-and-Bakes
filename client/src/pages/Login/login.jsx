@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux"; // Add Redux hooks
 import { loginUser } from "../../services/authService"; // API call for login
-import { setUser } from "../../redux/slices/authSlices"; // Redux action to set user
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PropTypes from "prop-types";
 
@@ -30,45 +29,43 @@ const Login = ({ isOpen, onClose, switchMode }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
+
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      setIsLoading(false); // Stop loading
-    } else {
-      setErrors({});
-      try {
-        const response = await loginUser({
+      setIsLoading(false);
+      return;
+    }
+
+    setErrors({});
+    try {
+      const response = await loginUser(
+        {
           username: formData.username,
           password: formData.password,
-        });
+        },
+        dispatch // ✅ Pass dispatch to instantly update Redux
+      );
 
-        // Set user in Redux store
-        dispatch(setUser(response.user)); // Dispatch user to Redux store
-
-        // Save token in localStorage for persistence
-        localStorage.setItem("authToken", response.token);
-
-        // Display success message
-        setSuccessMessage("Login successful!");
-
-        // Clear form and close modal after a delay
-        setTimeout(() => {
-          setFormData({ username: "", password: "" }); // Clear form data
-          setSuccessMessage(""); // Clear success message
-          onClose(); // Close modal
-        }, 1000); // Adjust delay as needed
-      } catch (error) {
-        if (error.response?.status === 401) {
-          setErrors({ form: "Invalid username or password." });
-        } else {
-          const errorMessage =
-            error.response?.data?.message || "Login failed. Please try again.";
-          setErrors({ form: errorMessage });
-        }
-      } finally {
-        setIsLoading(false); // Stop loading
+      if (response.user.role === "admin") {
+        setErrors({ form: "Admins are not allowed to log in here." });
+        setIsLoading(false);
+        return;
       }
+
+      // ✅ User profile updates instantly in Redux without reload
+      setSuccessMessage("Login successful!");
+
+      setTimeout(() => {
+        setFormData({ username: "", password: "" });
+        setSuccessMessage("");
+        onClose();
+      }, 1000);
+    } catch (error) {
+      setErrors({ form: error.response?.data?.message || "Login failed." });
+    } finally {
+      setIsLoading(false);
     }
   };
 

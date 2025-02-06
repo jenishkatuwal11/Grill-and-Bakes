@@ -1,24 +1,31 @@
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/slices/authSlices";
 import { useNavigate, Link } from "react-router-dom";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { FaBars, FaUserCircle } from "react-icons/fa";
-import { useState } from "react";
 import PropTypes from "prop-types";
 import assets from "../../assets/assets";
 
 const Navbar = ({ toggleLoginModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { user } = useSelector((state) => state.auth); // Access user state from Redux
+  const [currentUser, setCurrentUser] = useState(null); // ✅ Local state for UI updates
+  const { user } = useSelector((state) => state.auth); // Get user from Redux
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // ✅ Watch for changes in Redux state and update Navbar instantly
+  useEffect(() => {
+    setCurrentUser(user);
+  }, [user]);
+
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem("authToken"); // Clear token
-    setIsDropdownOpen(false); // Close dropdown
+    localStorage.removeItem("authToken");
+    setIsDropdownOpen(false);
+    setCurrentUser(null); // ✅ Clear user from local state
     navigate("/");
   };
 
@@ -87,29 +94,25 @@ const Navbar = ({ toggleLoginModal }) => {
         {/* Basket Icon */}
         <IoFastFoodOutline className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-maroon hover:text-black cursor-pointer" />
 
-        {/* Conditional Rendering: Profile Icon or Sign In */}
-        {user ? (
+        {/* ✅ Show Profile Icon or Sign In Instantly */}
+        {currentUser ? (
           <div className="relative">
-            {/* Profile Icon */}
             <div
               className="flex items-center cursor-pointer"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <FaUserCircle className="text-maroon w-8 h-8 sm:w-10 sm:h-10" />
               <span className="ml-2 text-dark-brown font-medium">
-                {user.username}
+                {currentUser.username}
               </span>
             </div>
 
             {/* Dropdown */}
             {isDropdownOpen && (
-              <div
-                className="absolute right-0 mt-2 bg-white shadow-md rounded-lg w-56 py-2 z-10"
-                style={{ overflowWrap: "break-word", whiteSpace: "normal" }}
-              >
+              <div className="absolute right-0 mt-2 bg-white shadow-md rounded-lg w-56 py-2 z-10">
                 <div className="px-4 py-2 text-gray-700">
-                  <p className="font-semibold">{user.username}</p>
-                  <p className="text-sm break-words">{user.email}</p>
+                  <p className="font-semibold">{currentUser.username}</p>
+                  <p className="text-sm">{currentUser.email}</p>
                 </div>
                 <div className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   <button onClick={handleLogout}>Logout</button>
@@ -118,7 +121,7 @@ const Navbar = ({ toggleLoginModal }) => {
             )}
           </div>
         ) : (
-          // Show "Sign In" button if the user is not logged in
+          // Show "Sign In" button if user is not logged in
           <button
             className="px-3 py-1 sm:px-4 sm:py-1 md:px-5 md:py-2 border rounded-full text-dark-brown border-maroon hover:bg-maroon hover:text-light-beige text-sm sm:text-base md:text-lg"
             onClick={toggleLoginModal}
@@ -135,59 +138,12 @@ const Navbar = ({ toggleLoginModal }) => {
           <FaBars className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
         </button>
       </div>
-
-      {/* Dropdown Menu for Hamburger */}
-      {isMenuOpen && (
-        <div
-          className="absolute top-[100%] right-4 bg-light-beige shadow-lg rounded-lg w-48 lg:hidden"
-          style={{ backgroundColor: "#F5F5DC", padding: "0.5rem 1rem" }}
-        >
-          <ul className="flex flex-col items-start p-2 space-y-2 text-dark-brown">
-            <li>
-              <Link
-                to="/"
-                className="hover:text-maroon w-full text-left"
-                onClick={() => setIsMenuOpen(false)} // Close menu after click
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="hover:text-maroon w-full text-left"
-                onClick={() => setIsMenuOpen(false)} // Close menu after click
-              >
-                Your Drink
-              </a>
-            </li>
-            <li>
-              <Link
-                to="/mobile-app"
-                className="hover:text-maroon w-full text-left"
-                onClick={() => setIsMenuOpen(false)} // Close menu after click
-              >
-                Mobile App
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/contact-us"
-                className="hover:text-maroon w-full text-left"
-                onClick={() => setIsMenuOpen(false)} // Close menu after click
-              >
-                Contact Us
-              </Link>
-            </li>
-          </ul>
-        </div>
-      )}
     </nav>
   );
 };
 
 Navbar.propTypes = {
-  toggleLoginModal: PropTypes.func.isRequired, // Prop for triggering the Login Modal
+  toggleLoginModal: PropTypes.func.isRequired,
 };
 
 export default Navbar;

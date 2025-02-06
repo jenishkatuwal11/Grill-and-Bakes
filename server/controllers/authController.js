@@ -27,6 +27,7 @@ const registerUser = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      role: "user", // Default role for regular users
     });
 
     // Generate token
@@ -34,6 +35,7 @@ const registerUser = async (req, res) => {
       id: user._id,
       username: user.username,
       email: user.email,
+      role: user.role,
     });
 
     // Respond with the new user's details and a token
@@ -63,6 +65,13 @@ const loginUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Prevent admins from logging in via this endpoint
+    if (user.role === "admin") {
+      return res
+        .status(403)
+        .json({ message: "Admins are not allowed to log in here." });
+    }
+
     // Verify the password
     const isMatch = await matchPassword(password, user.password);
     if (!isMatch) {
@@ -74,6 +83,7 @@ const loginUser = async (req, res) => {
       id: user._id,
       username: user.username,
       email: user.email,
+      role: user.role,
     });
 
     // Respond with user details and a token
@@ -83,6 +93,7 @@ const loginUser = async (req, res) => {
         _id: user._id,
         username: user.username,
         email: user.email,
+        role: user.role,
       },
       token,
     });
@@ -92,4 +103,46 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+// Login Admin
+const loginAdmin = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Check if the admin exists in the database
+    const admin = await User.findOne({ username, role: "admin" });
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    // Verify the password
+    const isMatch = await matchPassword(password, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Generate token
+    const token = generateToken({
+      id: admin._id,
+      username: admin.username,
+      email: admin.email,
+      role: admin.role,
+    });
+
+    // Respond with admin details and a token
+    res.status(200).json({
+      message: "Admin login successful",
+      user: {
+        _id: admin._id,
+        username: admin.username,
+        email: admin.email,
+        role: admin.role,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Error in loginAdmin:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
+  }
+};
+
+module.exports = { registerUser, loginUser, loginAdmin };

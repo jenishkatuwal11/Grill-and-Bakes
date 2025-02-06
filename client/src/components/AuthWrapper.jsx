@@ -1,33 +1,59 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setUser } from "../redux/slices/authSlices"; // Adjust the path as needed
-import { jwtDecode } from "jwt-decode";
-
-import PropTypes from "prop-types"; // Import PropTypes
+import { setUser, logout } from "../redux/slices/authSlices";
+import { jwtDecode } from "jwt-decode"; // Ensure this is correctly imported
+import PropTypes from "prop-types";
 
 const AuthWrapper = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
+    const userToken = localStorage.getItem("userAuthToken");
+    const adminToken = localStorage.getItem("adminAuthToken");
+
+    const decodeAndSetUser = (token, role) => {
       try {
-        const user = jwtDecode(token); // Decode token to extract user info
-        dispatch(setUser(user)); // Update Redux store with user info
+        const decoded = jwtDecode(token);
+
+        // Check if token has expired
+        if (decoded.exp * 1000 < Date.now()) {
+          console.warn(`${role} token expired. Logging out...`);
+          localStorage.removeItem(
+            role === "admin" ? "adminAuthToken" : "userAuthToken"
+          );
+          dispatch(logout());
+          return;
+        }
+
+        dispatch(
+          setUser({
+            user: {
+              username: decoded.username,
+              email: decoded.email,
+              role: decoded.role,
+              _id: decoded.id,
+            },
+            role: decoded.role,
+          })
+        );
       } catch (error) {
-        console.error("Error decoding token:", error);
-        // Clear invalid token
-        localStorage.removeItem("authToken");
+        console.error(`Error decoding ${role} token:`, error);
+        localStorage.removeItem(
+          role === "admin" ? "adminAuthToken" : "userAuthToken"
+        ); // Remove invalid token
+        dispatch(logout()); // Ensure state is cleared
       }
-    }
+    };
+
+    if (userToken) decodeAndSetUser(userToken, "user");
+    if (adminToken) decodeAndSetUser(adminToken, "admin");
   }, [dispatch]);
 
   return <>{children}</>;
 };
 
-// Add PropTypes validation
 AuthWrapper.propTypes = {
-  children: PropTypes.node.isRequired, // Ensure children are valid React nodes and required
+  children: PropTypes.node.isRequired,
 };
 
 export default AuthWrapper;

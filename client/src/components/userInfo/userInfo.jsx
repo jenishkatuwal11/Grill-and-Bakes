@@ -8,8 +8,10 @@ const UserInfo = ({ user }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
+    dispatch(logout()); // Clears Redux state
+    localStorage.removeItem("userAuthToken"); // Ensures user token is removed
+    localStorage.removeItem("adminAuthToken"); // Ensures admin token is removed
+    navigate("/"); // Redirect to homepage after logout
   };
 
   return (
@@ -22,9 +24,13 @@ const UserInfo = ({ user }) => {
         />
         <span className="text-gray-700 font-medium">{user.username}</span>
       </div>
+      {/* Ensuring dropdown disappears after logout */}
       <div className="absolute right-0 mt-2 bg-white shadow-md rounded-lg w-40 py-2">
-        <div className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
-          <button onClick={handleLogout}>Logout</button>
+        <div
+          className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+          onClick={handleLogout} // Clicking anywhere in this div will log out
+        >
+          Logout
         </div>
       </div>
     </div>
