@@ -1,7 +1,12 @@
 const AdminDashboard = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <h1 className="text-3xl font-bold">Welcome to the Admin Dashboard</h1>
+    <div className="p-8">
+      <h1 className="flex justify-center items-center h-full text-2xl font-bold text-dark-brown">
+        Welcome to Admin Dashboard
+      </h1>
+      <p className=" flex justify-center items-center h-full text-gray-700 mt-2">
+        Manage your orders, users, and reports here.
+      </p>
     </div>
   );
 };
