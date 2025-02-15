@@ -13,14 +13,14 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  // Close sidebar on navigation
+  // Close sidebar on navigation in small & medium screens
   const handleNavClick = () => setIsOpen(false);
 
   return (
     <>
-      {/* Hamburger Menu Button (Mobile View) */}
+      {/* Hamburger Menu Button (Small & Medium Screens) */}
       <button
-        className="absolute top-4 left-4 text-maroon md:hidden"
+        className="fixed top-4 left-4 z-50 text-maroon lg:hidden"
         onClick={() => setIsOpen(!isOpen)}
       >
         <FaBars size={24} />
@@ -28,14 +28,18 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-screen bg-gray-100 shadow-lg w-64 transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out md:translate-x-0`}
+        className={`fixed top-0 left-0 z-30 h-screen bg-gray-100 shadow-lg w-64 transition-transform duration-300 ease-in-out 
+          ${
+            isOpen ? "translate-x-0" : "-translate-x-full md:-translate-x-full"
+          } 
+          lg:translate-x-0`}
       >
         <div className="bg-maroon text-white text-lg font-bold px-6 py-4 flex items-center justify-between">
-          <span>Dashboard</span>
-          {/* Close Button for Mobile */}
-          <button className="md:hidden" onClick={() => setIsOpen(false)}>
+          {/* ✅ Hide "Dashboard" on Small & Medium Screens */}
+          <span className="hidden md:hidden lg:block">Dashboard</span>
+
+          {/* Close Button (Only Visible in Small & Medium Screens) */}
+          <button className="lg:hidden" onClick={() => setIsOpen(false)}>
             ✖
           </button>
         </div>
