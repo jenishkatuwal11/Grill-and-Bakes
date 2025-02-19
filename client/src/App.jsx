@@ -3,6 +3,7 @@ import { useState } from "react";
 import HomePage from "./pages/Home/homepage";
 import MobileApp from "./pages/Mobile_App/mobileApp";
 import ContactUs from "./pages/ContactUs/contactUs";
+import YourDrink from "./pages/YourDrink/YourDrink";
 import Cart from "./pages/Cart/Carts";
 import Navbar from "./components/Navbar/Navbar";
 import Login from "./pages/Login/login";
@@ -66,6 +67,7 @@ const App = () => {
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/mobile-app" element={<MobileApp />} />
+          <Route path="/your-drink" element={<YourDrink />} />
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/cart" element={<Cart />} />
 
