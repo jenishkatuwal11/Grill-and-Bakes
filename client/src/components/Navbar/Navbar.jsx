@@ -60,9 +60,9 @@ const Navbar = ({ toggleLoginModal }) => {
             </Link>
           </li>
           <li>
-            <a href="#" className="hover:text-maroon">
+            <Link to="/your-drink" className="hover:text-maroon">
               Your Drink
-            </a>
+            </Link>
           </li>
           <li>
             <Link to="/mobile-app" className="hover:text-maroon">

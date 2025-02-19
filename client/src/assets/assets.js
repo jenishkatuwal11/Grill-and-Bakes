@@ -20,6 +20,13 @@ import BBQPrawns from "./MenuItems/GrilledPrawns.jpg";
 import SpringRoll from "./MenuItems/SpringRolls.jpg";
 import BolognaPizza from "./MenuItems/BolognaPizza.jpg";
 import FruitSalad from "./MenuItems/FruitSalad.jpg";
+import BerryBlast from "./Drinks/BerryBlast.jpg";
+import CaramelMacchiato from "./Drinks/CaramelMacchiato.jpg";
+import EspressoShot from "./Drinks/EspressoShot.png";
+import LemonIcedTea from "./Drinks/LemonIcedTea.jpg";
+import MangoSmoothie from "./Drinks/MangoSmoothie.jpeg";
+import MochaCoffee from "./Drinks/MochaCoffee.jpg";
+import SignatureLatte from "./Drinks/SignatureLatte.jpg";
 const assests = {
   Mainlogo,
   footerImg,
@@ -43,6 +50,13 @@ const assests = {
   SpringRoll,
   BolognaPizza,
   FruitSalad,
+  BerryBlast,
+  CaramelMacchiato,
+  EspressoShot,
+  LemonIcedTea,
+  MangoSmoothie,
+  MochaCoffee,
+  SignatureLatte,
 };
 
 export default assests;
