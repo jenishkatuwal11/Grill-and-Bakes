@@ -4,19 +4,18 @@ import { logout } from "../../redux/slices/authSlices";
 import { useNavigate, Link } from "react-router-dom";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
-import { FaBars, FaUserCircle } from "react-icons/fa";
+import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa"; // Added FaTimes for closing the menu
 import PropTypes from "prop-types";
 import assets from "../../assets/assets";
 
 const Navbar = ({ toggleLoginModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null); // ✅ Local state for UI updates
-  const { user } = useSelector((state) => state.auth); // Get user from Redux
+  const [currentUser, setCurrentUser] = useState(null);
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ✅ Watch for changes in Redux state and update Navbar instantly
   useEffect(() => {
     setCurrentUser(user);
   }, [user]);
@@ -25,7 +24,7 @@ const Navbar = ({ toggleLoginModal }) => {
     dispatch(logout());
     localStorage.removeItem("authToken");
     setIsDropdownOpen(false);
-    setCurrentUser(null); // ✅ Clear user from local state
+    setCurrentUser(null);
     navigate("/");
   };
 
@@ -94,7 +93,7 @@ const Navbar = ({ toggleLoginModal }) => {
         {/* Basket Icon */}
         <IoFastFoodOutline className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-maroon hover:text-black cursor-pointer" />
 
-        {/* ✅ Show Profile Icon or Sign In Instantly */}
+        {/* Show Profile Icon or Sign In Instantly */}
         {currentUser ? (
           <div className="relative">
             <div
@@ -121,7 +120,6 @@ const Navbar = ({ toggleLoginModal }) => {
             )}
           </div>
         ) : (
-          // Show "Sign In" button if user is not logged in
           <button
             className="px-3 py-1 sm:px-4 sm:py-1 md:px-5 md:py-2 border rounded-full text-dark-brown border-maroon hover:bg-maroon hover:text-light-beige text-sm sm:text-base md:text-lg"
             onClick={toggleLoginModal}
@@ -132,12 +130,60 @@ const Navbar = ({ toggleLoginModal }) => {
 
         {/* Hamburger Menu for Small Screens */}
         <button
-          className="block lg:hidden"
+          className="block lg:hidden ml-auto"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          <FaBars className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
+          {isMenuOpen ? (
+            <FaTimes className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
+          ) : (
+            <FaBars className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
+          )}
         </button>
       </div>
+
+      {/* Mobile Menu (Dropdown) */}
+      {isMenuOpen && (
+        <div className="absolute top-16 right-0 w-40 bg-pink-100 shadow-md z-40 lg:hidden">
+          <ul className="flex flex-col text-center text-dark-brown p-4 space-y-3">
+            <li>
+              <Link
+                to="/"
+                className="hover:text-maroon"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/your-drink"
+                className="hover:text-maroon"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Your Drink
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/mobile-app"
+                className="hover:text-maroon"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Mobile App
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/contact-us"
+                className="hover:text-maroon"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contact Us
+              </Link>
+            </li>
+          </ul>
+        </div>
+      )}
     </nav>
   );
 };
