@@ -4,11 +4,11 @@ import HomePage from "./pages/Home/homepage";
 import MobileApp from "./pages/Mobile_App/mobileApp";
 import ContactUs from "./pages/ContactUs/contactUs";
 import YourDrink from "./pages/YourDrink/YourDrink";
-import Cart from "./pages/Cart/Carts";
 import Navbar from "./components/Navbar/Navbar";
 import Login from "./pages/Login/login";
 import Register from "./pages/Register/register";
 import AuthWrapper from "./components/AuthWrapper";
+import Checkout from "./pages/Checkout/Checkout";
 // Admin Routes
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -69,7 +69,7 @@ const App = () => {
           <Route path="/mobile-app" element={<MobileApp />} />
           <Route path="/your-drink" element={<YourDrink />} />
           <Route path="/contact-us" element={<ContactUs />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
 
           {/* Admin Login Route */}
           <Route path="/admin/login" element={<AdminLogin />} />
