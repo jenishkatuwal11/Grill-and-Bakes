@@ -1,33 +1,22 @@
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToCart,
+  increaseQuantity,
+  decreaseQuantity,
+  removeFromCart,
+} from "../../redux/slices/cartSlice";
 import { FaPlus, FaMinus, FaTimes } from "react-icons/fa";
 import Footer from "../../components/Footer/Footer";
 import assets from "../../assets/assets";
 
 const YourDrink = () => {
-  const [drinkCounts, setDrinkCounts] = useState({});
+  const dispatch = useDispatch();
+  const { cartItems } = useSelector((state) => state.cart);
 
-  // Increase Quantity
-  const increaseCount = (drinkName) => {
-    setDrinkCounts((prev) => ({
-      ...prev,
-      [drinkName]: (prev[drinkName] || 0) + 1,
-    }));
-  };
-
-  // Decrease Quantity
-  const decreaseCount = (drinkName) => {
-    setDrinkCounts((prev) => ({
-      ...prev,
-      [drinkName]: Math.max((prev[drinkName] || 0) - 1, 0),
-    }));
-  };
-
-  // Reset Quantity
-  const resetCount = (drinkName) => {
-    setDrinkCounts((prev) => ({
-      ...prev,
-      [drinkName]: 0,
-    }));
+  // Function to get item quantity from Redux store
+  const getItemQuantity = (drinkName) => {
+    const item = cartItems.find((item) => item.name === drinkName);
+    return item ? item.quantity : 0;
   };
 
   // Drink Sections Data
@@ -54,7 +43,7 @@ const YourDrink = () => {
           description: "A fizzy delight with citrus flavors.",
         },
       ],
-      showCustomizeButton: true, // ✅ Customize button only for this section
+      showCustomizeButton: true,
     },
     {
       title: "Chef Favorite",
@@ -141,39 +130,45 @@ const YourDrink = () => {
                       className="w-full h-40 object-cover"
                     />
 
-                    {/* Add Button - Bottom-Right of Image (partially overlapping) */}
-                    {!drinkCounts[drink.name] ? (
-                      <button
-                        className="absolute bottom-2 right-2 w-8 h-8 flex items-center justify-center text-white bg-maroon rounded-full hover:bg-dark-brown transition"
-                        onClick={() => increaseCount(drink.name)}
-                      >
-                        <FaPlus />
-                      </button>
-                    ) : (
-                      <div className="absolute bottom-2 right-2 flex items-center bg-white rounded-full shadow-md p-1">
+                    {/* Add Button - Bottom-Right of Image */}
+                    <div className="absolute bottom-2 right-2 flex items-center justify-center bg-white rounded-full shadow-md ">
+                      {getItemQuantity(drink.name) > 0 ? (
+                        <>
+                          <button
+                            onClick={() =>
+                              dispatch(decreaseQuantity(drink.name))
+                            }
+                            className="w-7 h-7 flex items-center justify-center text-white bg-red-500 rounded-full hover:bg-red-600 transition"
+                          >
+                            <FaMinus />
+                          </button>
+                          <span className="text-maroon font-semibold text-lg w-8 text-center">
+                            {getItemQuantity(drink.name)}
+                          </span>
+                          <button
+                            onClick={() =>
+                              dispatch(increaseQuantity(drink.name))
+                            }
+                            className="w-7 h-7  flex items-center justify-center text-white bg-green-500 rounded-full hover:bg-green-600 transition"
+                          >
+                            <FaPlus />
+                          </button>
+                          <button
+                            onClick={() => dispatch(removeFromCart(drink.name))}
+                            className="w-7 h-7 flex items-center justify-center text-red-500 hover:text-dark-brown transition"
+                          >
+                            <FaTimes />
+                          </button>
+                        </>
+                      ) : (
                         <button
-                          className="w-8 h-8 flex items-center justify-center text-white bg-red-500 rounded-full hover:bg-red-600 transition"
-                          onClick={() => decreaseCount(drink.name)}
-                        >
-                          <FaMinus />
-                        </button>
-                        <span className="mx-2 text-maroon font-semibold">
-                          {drinkCounts[drink.name]}
-                        </span>
-                        <button
-                          className="w-8 h-8 flex items-center justify-center text-white bg-green-500 rounded-full hover:bg-green-600 transition"
-                          onClick={() => increaseCount(drink.name)}
+                          onClick={() => dispatch(addToCart(drink))}
+                          className="w-7 h-7  flex items-center justify-center text-white bg-maroon rounded-full hover:bg-dark-brown transition"
                         >
                           <FaPlus />
                         </button>
-                        <button
-                          className="ml-2 w-8 h-8 flex items-center justify-center text-red-500 hover:text-dark-brown transition"
-                          onClick={() => resetCount(drink.name)}
-                        >
-                          <FaTimes />
-                        </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
 
                   {/* Drink Info */}
@@ -185,7 +180,7 @@ const YourDrink = () => {
                       {drink.description}
                     </p>
 
-                    {/* Price & Customize Button (Only for Custom Drinks Section) */}
+                    {/* Price & Customize Button */}
                     <div className="flex justify-between items-center">
                       <p className="text-lg font-bold text-maroon">
                         {drink.price}
