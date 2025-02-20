@@ -57,20 +57,20 @@ const CartModal = ({ isOpen, onClose }) => {
 
                 <div className="flex items-center space-x-2">
                   <button
-                    className="w-8 h-8 text-white bg-red-500 rounded-full hover:bg-red-600"
+                    className="w-8 h-8 flex items-center justify-center text-white bg-red-500 rounded-full hover:bg-red-600"
                     onClick={() => dispatch(decreaseQuantity(item.name))}
                   >
                     <FaMinus />
                   </button>
                   <span className="text-lg font-semibold">{item.quantity}</span>
                   <button
-                    className="w-8 h-8 text-white bg-green-500 rounded-full hover:bg-green-600"
+                    className="w-8 h-8 flex items-center justify-center text-white bg-green-500 rounded-full hover:bg-green-600"
                     onClick={() => dispatch(increaseQuantity(item.name))}
                   >
                     <FaPlus />
                   </button>
                   <button
-                    className="w-8 h-8 text-red-500 hover:text-dark-brown transition"
+                    className="w-8 h-8 flex items-center justify-center text-red-500 hover:text-dark-brown transition"
                     onClick={() => dispatch(removeFromCart(item))}
                   >
                     <FaTimes />

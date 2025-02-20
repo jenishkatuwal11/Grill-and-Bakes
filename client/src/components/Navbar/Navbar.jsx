@@ -4,15 +4,19 @@ import { logout } from "../../redux/slices/authSlices";
 import { useNavigate, Link } from "react-router-dom";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
-import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa"; // Added FaTimes for closing the menu
+import { FaBars, FaUserCircle } from "react-icons/fa";
 import PropTypes from "prop-types";
 import assets from "../../assets/assets";
+import CartModal from "../CartModal"; // ✅ Import Cart Modal
 
 const Navbar = ({ toggleLoginModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false); // ✅ State for Cart Modal
   const [currentUser, setCurrentUser] = useState(null);
+
   const { user } = useSelector((state) => state.auth);
+  const { totalQuantity } = useSelector((state) => state.cart); // ✅ Get total cart count
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -90,10 +94,20 @@ const Navbar = ({ toggleLoginModal }) => {
 
       {/* Icons and Profile/Sign In */}
       <div className="flex items-center space-x-4 lg:space-x-6">
-        {/* Basket Icon */}
-        <IoFastFoodOutline className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-maroon hover:text-black cursor-pointer" />
+        {/* ✅ Cart Icon with Badge */}
+        <div
+          className="relative cursor-pointer"
+          onClick={() => setIsCartOpen(true)}
+        >
+          <IoFastFoodOutline className="w-7 h-7 sm:w-8 sm:h-8 text-maroon hover:text-black" />
+          {totalQuantity > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {totalQuantity}
+            </span>
+          )}
+        </div>
 
-        {/* Show Profile Icon or Sign In Instantly */}
+        {/* User Profile or Sign In */}
         {currentUser ? (
           <div className="relative">
             <div
@@ -105,8 +119,6 @@ const Navbar = ({ toggleLoginModal }) => {
                 {currentUser.username}
               </span>
             </div>
-
-            {/* Dropdown */}
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 bg-white shadow-md rounded-lg w-56 py-2 z-10">
                 <div className="px-4 py-2 text-gray-700">
@@ -128,62 +140,17 @@ const Navbar = ({ toggleLoginModal }) => {
           </button>
         )}
 
-        {/* Hamburger Menu for Small Screens */}
+        {/* Hamburger Menu */}
         <button
-          className="block lg:hidden ml-auto"
+          className="block lg:hidden"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          {isMenuOpen ? (
-            <FaTimes className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
-          ) : (
-            <FaBars className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
-          )}
+          <FaBars className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
         </button>
       </div>
 
-      {/* Mobile Menu (Dropdown) */}
-      {isMenuOpen && (
-        <div className="absolute top-16 right-0 w-40 bg-pink-100 shadow-md z-40 lg:hidden">
-          <ul className="flex flex-col text-center text-dark-brown p-4 space-y-3">
-            <li>
-              <Link
-                to="/"
-                className="hover:text-maroon"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/your-drink"
-                className="hover:text-maroon"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Your Drink
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/mobile-app"
-                className="hover:text-maroon"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Mobile App
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/contact-us"
-                className="hover:text-maroon"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contact Us
-              </Link>
-            </li>
-          </ul>
-        </div>
-      )}
+      {/* ✅ Cart Modal */}
+      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>
   );
 };

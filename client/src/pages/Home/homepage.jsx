@@ -1,33 +1,21 @@
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToCart,
+  increaseQuantity,
+  decreaseQuantity,
+  removeFromCart,
+} from "../../redux/slices/cartSlice"; // ✅ Import Cart Actions
 import Slider from "react-slick";
 import { FaPlus, FaMinus, FaTimes } from "react-icons/fa";
-import assets from "../../assets/assets"; // Ensure correct paths for your images
+import assets from "../../assets/assets";
 import Footer from "../../components/Footer/Footer";
 
 const HomePage = () => {
+  const dispatch = useDispatch();
+  const { cartItems } = useSelector((state) => state.cart);
+
   const [fadeIn, setFadeIn] = useState(false);
-  const [itemQuantities, setItemQuantities] = useState({}); // Track quantities of each item
-
-  const handleIncrease = (itemName) => {
-    setItemQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [itemName]: (prevQuantities[itemName] || 0) + 1,
-    }));
-  };
-
-  const handleDecrease = (itemName) => {
-    setItemQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [itemName]: Math.max((prevQuantities[itemName] || 0) - 1, 0),
-    }));
-  };
-
-  const handleReset = (itemName) => {
-    setItemQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [itemName]: 0,
-    }));
-  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -53,6 +41,11 @@ const HomePage = () => {
     console.log(`${category} clicked`);
   };
 
+  const getItemQuantity = (itemName) => {
+    const item = cartItems.find((item) => item.name === itemName);
+    return item ? item.quantity : 0;
+  };
+
   return (
     <>
       {/* Hero Section */}
@@ -70,11 +63,9 @@ const HomePage = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
               Order your favourite food here
             </h1>
-            <p className="text-light-beige text-base md:text-lg mb-6 text-opacity-10">
+            <p className="text-light-beige text-base md:text-lg mb-6">
               Choose from a diverse menu featuring a delectable array of dishes
-              crafted with the finest ingredients and culinary expertise. Our
-              mission is to satisfy your cravings and elevate your dining
-              experience, one delicious meal at a time.
+              crafted with the finest ingredients and culinary expertise.
             </p>
             <button className="px-6 py-3 bg-maroon text-light-beige text-lg rounded-full hover:bg-dark-brown transition-all">
               View Menu
@@ -91,8 +82,6 @@ const HomePage = () => {
           </h2>
           <p className="text-dark-gray text-base md:text-lg mb-10 text-left">
             Choose from a diverse menu featuring a delectable array of dishes.
-            Our mission is to satisfy your cravings and elevate your dining
-            experience, one delicious meal at a time.
           </p>
 
           {/* Slider */}
@@ -130,11 +119,6 @@ const HomePage = () => {
           </Slider>
         </div>
       </section>
-
-      {/* Horizontal Line */}
-      <div className="mt-8 mb-12 flex justify-center items-center">
-        <hr className="w-3/4 h-1 rounded-full bg-gradient-to-r from-maroon to-dark-brown border-0" />
-      </div>
 
       {/* Menu Items Section */}
       <section className="bg-white py-12 md:py-20 px-6 md:px-16 lg:px-32">
@@ -181,7 +165,6 @@ const HomePage = () => {
                 key={index}
                 className="bg-white shadow-md rounded-lg overflow-hidden"
               >
-                {/* Image Section */}
                 <div className="relative">
                   <img
                     src={item.img}
@@ -189,43 +172,40 @@ const HomePage = () => {
                     className="w-full h-40 object-cover"
                   />
                   <div className="absolute bottom-2 right-2 flex items-center bg-white rounded-full shadow-md">
-                    {itemQuantities[item.name] !== undefined &&
-                    itemQuantities[item.name] > 0 ? (
+                    {getItemQuantity(item.name) > 0 ? (
                       <>
                         <button
-                          className="w-8 h-8 flex items-center justify-center text-white bg-red-500 rounded-full hover:bg-dark-brown transition"
-                          onClick={() => handleDecrease(item.name)}
+                          onClick={() => dispatch(decreaseQuantity(item.name))}
+                          className="w-7 h-7 flex items-center justify-center text-white bg-red-500 rounded-full hover:bg-red-600 transition"
                         >
                           <FaMinus />
                         </button>
-                        <span className="mx-2 text-maroon font-semibold">
-                          {itemQuantities[item.name]}
+                        <span className="text-maroon font-semibold text-lg w-8 text-center">
+                          {getItemQuantity(item.name)}
                         </span>
                         <button
-                          className="w-8 h-8 flex items-center justify-center text-white bg-green-500 rounded-full hover:bg-dark-brown transition"
-                          onClick={() => handleIncrease(item.name)}
+                          onClick={() => dispatch(increaseQuantity(item.name))}
+                          className="w-7 h-7 flex items-center justify-center text-white bg-green-500 rounded-full"
                         >
                           <FaPlus />
                         </button>
                         <button
-                          className="ml-2 w-8 h-8 flex items-center justify-center text-red-500 hover:text-dark-brown transition"
-                          onClick={() => handleReset(item.name)}
+                          onClick={() => dispatch(removeFromCart(item.name))}
+                          className="w-7 h-7 flex items-center justify-center text-red-500"
                         >
                           <FaTimes />
                         </button>
                       </>
                     ) : (
                       <button
+                        onClick={() => dispatch(addToCart(item))}
                         className="w-8 h-8 flex items-center justify-center text-white bg-maroon rounded-full hover:bg-dark-brown transition"
-                        onClick={() => handleIncrease(item.name)}
                       >
                         <FaPlus />
                       </button>
                     )}
                   </div>
                 </div>
-
-                {/* Content Section */}
                 <div className="p-4">
                   <h3 className="text-lg font-semibold text-dark-brown">
                     {item.name}
@@ -234,6 +214,7 @@ const HomePage = () => {
                     Food provides essential nutrients for overall health and
                     well-being.
                   </p>
+
                   <p className="text-lg font-bold text-maroon">{item.price}</p>
                 </div>
               </div>
