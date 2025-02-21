@@ -42,7 +42,7 @@ const AddItems = () => {
     setItemName("");
     setDescription("");
     setPrice("");
-    setCategory("Drinks");
+    setCategory("");
     setImage(null);
     setPreview(null);
   };
@@ -114,7 +114,7 @@ const AddItems = () => {
 
           <div>
             <label className="block text-gray-700 font-semibold mb-1">
-              Price ($)
+              Price (रु)
             </label>
             <input
               type="number"
@@ -134,8 +134,9 @@ const AddItems = () => {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
-              <option value="Drinks">Drinks</option>
-              <option value="Snacks">Snacks</option>
+              <option value="Drinks">Custom Drinks</option>
+              <option value="Chef Favorite">Chef Favorite</option>
+              <option value="Beverages">Beverages</option>
               <option value="Meals">Meals</option>
             </select>
           </div>
@@ -182,7 +183,7 @@ const AddItems = () => {
                 {item.itemName}
               </h3>
               <p className="text-gray-600 truncate">{item.description}</p>
-              <p className="text-blue-500 font-bold">${item.price}</p>
+              <p className="text-blue-500 font-bold">रु{item.price}</p>
               <p className="text-gray-500 text-sm">Category: {item.category}</p>
             </div>
 
