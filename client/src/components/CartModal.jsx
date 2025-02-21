@@ -6,15 +6,15 @@ import {
   removeFromCart,
   clearCart,
 } from "../redux/slices/cartSlice";
-import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { useNavigate } from "react-router-dom"; //  Import useNavigate
 import PropTypes from "prop-types";
 
 const CartModal = ({ isOpen, onClose }) => {
-  const navigate = useNavigate(); // ✅ Initialize useNavigate for redirection
+  const navigate = useNavigate(); //  Initialize useNavigate for redirection
   const dispatch = useDispatch();
   const { cartItems, totalQuantity } = useSelector((state) => state.cart);
 
-  // ✅ Calculate Total Price
+  //  Calculate Total Price
   const calculateTotalPrice = () => {
     return cartItems.reduce(
       (total, item) =>
@@ -23,7 +23,7 @@ const CartModal = ({ isOpen, onClose }) => {
     );
   };
 
-  // ✅ Close if Cart is Not Open
+  //  Close if Cart is Not Open
   if (!isOpen) return null;
 
   return (
@@ -45,7 +45,7 @@ const CartModal = ({ isOpen, onClose }) => {
           <p className="text-gray-600 text-center">Your cart is empty.</p>
         ) : (
           <div className="space-y-4">
-            {/* ✅ List of Items in Cart */}
+            {/*  List of Items in Cart */}
             {cartItems.map((item) => (
               <div
                 key={item.name}
@@ -89,19 +89,19 @@ const CartModal = ({ isOpen, onClose }) => {
               </div>
             ))}
 
-            {/* ✅ Total Items & Price */}
+            {/*  Total Items & Price */}
             <div className="flex justify-between mt-4 text-lg font-bold">
               <span>Total Items: {totalQuantity}</span>
               <span>Total: ₹{calculateTotalPrice()}</span>
             </div>
 
-            {/* ✅ Buttons: Checkout & Clear Cart */}
+            {/*  Buttons: Checkout & Clear Cart */}
             <div className="flex flex-col space-y-3 mt-4">
               <button
                 className="w-full py-2 text-white bg-maroon rounded-lg hover:bg-dark-brown transition"
                 onClick={() => {
-                  onClose(); // ✅ Close modal on checkout
-                  navigate("/checkout"); // ✅ Redirect to checkout
+                  onClose(); //  Close modal on checkout
+                  navigate("/checkout"); //  Redirect to checkout
                 }}
               >
                 Proceed to Checkout

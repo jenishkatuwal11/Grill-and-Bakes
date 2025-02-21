@@ -147,6 +147,39 @@ const Navbar = ({ toggleLoginModal }) => {
         >
           <FaBars className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
         </button>
+        {/*  Mobile Menu */}
+        {isMenuOpen && (
+          <div className="absolute top-full right-0 w-40 bg-white shadow-md flex flex-col  space-y-4 px-2 py-4 lg:hidden">
+            <Link
+              to="/"
+              className="text-dark-brown hover:text-maroon"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/your-drink"
+              className="text-dark-brown hover:text-maroon"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Your Drink
+            </Link>
+            <Link
+              to="/mobile-app"
+              className="text-dark-brown hover:text-maroon"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Mobile App
+            </Link>
+            <Link
+              to="/contact-us"
+              className="text-dark-brown hover:text-maroon"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Contact Us
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* ✅ Cart Modal */}
