@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate for redirection
 import { FaUserCircle, FaSignOutAlt, FaBell } from "react-icons/fa";
 
 const AdminNavbar = () => {
@@ -11,6 +12,7 @@ const AdminNavbar = () => {
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const navigate = useNavigate(); // ✅ Initialize navigation
 
   // Handle Click Outside to Close Dropdowns
   useEffect(() => {
@@ -29,6 +31,12 @@ const AdminNavbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // ✅ Logout Function
+  const handleLogout = () => {
+    localStorage.removeItem("adminAuthToken"); // ✅ Remove Token
+    navigate("/admin/login"); // ✅ Redirect to Admin Login
+  };
 
   // Function to mark all notifications as read
   const markAllAsRead = () => {
@@ -111,7 +119,7 @@ const AdminNavbar = () => {
               </p>
               <button
                 className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100"
-                onClick={() => alert("Logging out...")}
+                onClick={handleLogout} // ✅ Call Logout Function
               >
                 <FaSignOutAlt className="mr-2" /> Logout
               </button>

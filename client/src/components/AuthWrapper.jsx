@@ -1,52 +1,36 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setUser, logout } from "../redux/slices/authSlices";
-import { jwtDecode } from "jwt-decode"; // Ensure this is correctly imported
+import { fetchCart } from "../redux/slices/cartSlice";
+import API from "../services/api"; // ✅ API service imported
 import PropTypes from "prop-types";
 
 const AuthWrapper = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const userToken = localStorage.getItem("userAuthToken");
-    const adminToken = localStorage.getItem("adminAuthToken");
-
-    const decodeAndSetUser = (token, role) => {
+    const checkUserSession = async () => {
       try {
-        const decoded = jwtDecode(token);
+        const response = await API.get("/auth/user", {
+          withCredentials: true, // ✅ Ensure cookies are sent
+        });
 
-        // Check if token has expired
-        if (decoded.exp * 1000 < Date.now()) {
-          console.warn(`${role} token expired. Logging out...`);
-          localStorage.removeItem(
-            role === "admin" ? "adminAuthToken" : "userAuthToken"
+        if (response.data.user && response.data.user.role === "user") {
+          dispatch(
+            setUser({ user: response.data.user, role: response.data.user.role })
           );
-          dispatch(logout());
-          return;
-        }
 
-        dispatch(
-          setUser({
-            user: {
-              username: decoded.username,
-              email: decoded.email,
-              role: decoded.role,
-              _id: decoded.id,
-            },
-            role: decoded.role,
-          })
-        );
+          dispatch(fetchCart()); // ✅ Fetch user's cart after setting user
+        } else {
+          dispatch(logout()); // ✅ Logout if no user session or admin
+        }
       } catch (error) {
-        console.error(`Error decoding ${role} token:`, error);
-        localStorage.removeItem(
-          role === "admin" ? "adminAuthToken" : "userAuthToken"
-        ); // Remove invalid token
-        dispatch(logout()); // Ensure state is cleared
+        console.error("Error fetching user session:", error);
+        dispatch(logout()); // ✅ Ensure logout if error occurs
       }
     };
 
-    if (userToken) decodeAndSetUser(userToken, "user");
-    if (adminToken) decodeAndSetUser(adminToken, "admin");
+    checkUserSession(); // ✅ Run on mount
   }, [dispatch]);
 
   return <>{children}</>;

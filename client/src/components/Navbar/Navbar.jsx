@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/slices/authSlices";
+import { fetchCart, clearCart } from "../../redux/slices/cartSlice"; // ✅ Import cart actions
 import { useNavigate, Link } from "react-router-dom";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { FaBars, FaUserCircle } from "react-icons/fa";
 import PropTypes from "prop-types";
+import API from "../../services/api";
 import assets from "../../assets/assets";
 import CartModal from "../CartModal"; // ✅ Import Cart Modal
 
@@ -13,23 +15,30 @@ const Navbar = ({ toggleLoginModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false); // ✅ State for Cart Modal
-  const [currentUser, setCurrentUser] = useState(null);
 
   const { user } = useSelector((state) => state.auth);
   const { totalQuantity } = useSelector((state) => state.cart); // ✅ Get total cart count
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // ✅ Fetch Cart when user logs in
   useEffect(() => {
-    setCurrentUser(user);
-  }, [user]);
+    if (user) {
+      dispatch(fetchCart());
+    }
+  }, [user, dispatch]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    localStorage.removeItem("authToken");
-    setIsDropdownOpen(false);
-    setCurrentUser(null);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await API.post("/auth/logout", {}, { withCredentials: true }); // ✅ Properly destroy session
+      dispatch(logout());
+      dispatch(clearCart()); // ✅ Ensure cart is cleared on logout
+      setIsDropdownOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
@@ -108,7 +117,7 @@ const Navbar = ({ toggleLoginModal }) => {
         </div>
 
         {/* User Profile or Sign In */}
-        {currentUser ? (
+        {user ? (
           <div className="relative">
             <div
               className="flex items-center cursor-pointer"
@@ -116,14 +125,14 @@ const Navbar = ({ toggleLoginModal }) => {
             >
               <FaUserCircle className="text-maroon w-8 h-8 sm:w-10 sm:h-10" />
               <span className="ml-2 text-dark-brown font-medium">
-                {currentUser.username}
+                {user.username}
               </span>
             </div>
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 bg-white shadow-md rounded-lg w-56 py-2 z-10">
                 <div className="px-4 py-2 text-gray-700">
-                  <p className="font-semibold">{currentUser.username}</p>
-                  <p className="text-sm">{currentUser.email}</p>
+                  <p className="font-semibold">{user.username}</p>
+                  <p className="text-sm">{user.email}</p>
                 </div>
                 <div className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   <button onClick={handleLogout}>Logout</button>
@@ -149,7 +158,7 @@ const Navbar = ({ toggleLoginModal }) => {
         </button>
         {/*  Mobile Menu */}
         {isMenuOpen && (
-          <div className="absolute top-full right-0 w-40 bg-white shadow-md flex flex-col  space-y-4 px-2 py-4 lg:hidden">
+          <div className="absolute top-full right-0 w-40 bg-white shadow-md flex flex-col space-y-4 px-2 py-4 lg:hidden">
             <Link
               to="/"
               className="text-dark-brown hover:text-maroon"

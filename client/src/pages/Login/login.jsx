@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux"; // Add Redux hooks
-import { loginUser } from "../../services/authService"; // API call for login
+import API from "../../services/api"; // Ensure API service is imported
+import { setUser } from "../../redux/slices/authSlices"; // ✅ Ensure Redux state updates
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PropTypes from "prop-types";
 
@@ -40,19 +41,25 @@ const Login = ({ isOpen, onClose, switchMode }) => {
 
     setErrors({});
     try {
-      const response = await loginUser(
+      const response = await API.post(
+        "/auth/login",
         {
           username: formData.username,
           password: formData.password,
         },
-        dispatch // ✅ Pass dispatch to instantly update Redux
+        { withCredentials: true } // ✅ Ensure cookies are sent
       );
 
-      if (response.user.role === "admin") {
+      if (response.data.user.role === "admin") {
         setErrors({ form: "Admins are not allowed to log in here." });
         setIsLoading(false);
         return;
       }
+
+      // ✅ Store user data in Redux (No more localStorage)
+      dispatch(
+        setUser({ user: response.data.user, role: response.data.user.role })
+      );
 
       // ✅ User profile updates instantly in Redux without reload
       setSuccessMessage("Login successful!");
@@ -188,7 +195,7 @@ const Login = ({ isOpen, onClose, switchMode }) => {
 
         {/* Footer */}
         <div className="text-center mt-6 text-sm text-gray-600">
-          Dont have an account?{" "}
+          Don&apos;t have an account?{" "}
           <span
             onClick={switchMode}
             className="text-maroon hover:underline hover:text-dark-brown transition cursor-pointer"

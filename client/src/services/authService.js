@@ -1,62 +1,67 @@
 import API from "./api";
 import { setUser } from "../redux/slices/authSlices";
 
-// Register User
+// ✅ Register User
 export const registerUser = async (userData) => {
   const response = await API.post("/auth/register", userData);
   return response.data;
 };
 
-// Login User
+// ✅ Fetch User Data (New Function)
+export const fetchUser = async (dispatch) => {
+  try {
+    const response = await API.get("/auth/user", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    });
+
+    // ✅ Dispatch the user details to Redux
+    dispatch(setUser({ user: response.data.user }));
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    dispatch(setUser({ user: null })); // Clear user state if request fails
+  }
+};
+
+// ✅ Login User
 export const loginUser = async (credentials, dispatch) => {
   try {
-    const response = await API.post("/auth/login", credentials); // API call to login endpoint
+    const response = await API.post("/auth/login", credentials);
 
-    // Extract token and user data from the response
-    const { token, user } = response.data;
+    // ✅ Store only the token
+    localStorage.setItem("authToken", response.data.token);
 
-    // Check the role and store the token appropriately
-    if (user.role === "user") {
-      localStorage.setItem("userAuthToken", token);
-      localStorage.removeItem("adminAuthToken");
-    } else if (user.role === "admin") {
-      localStorage.setItem("adminAuthToken", token);
-      localStorage.removeItem("userAuthToken");
-    }
+    // ✅ Fetch user details after login
+    await fetchUser(dispatch);
 
-    //  Dispatch user data to Redux **instantly**
-    dispatch(setUser({ user, role: user.role }));
-
-    return { user, token };
+    return response.data;
   } catch (error) {
     console.error("Error in loginUser:", error);
     throw error.response?.data || { message: "An error occurred" };
   }
 };
-// Login Admin
+
+// ✅ Login Admin
 export const loginAdmin = async (credentials, dispatch) => {
-  // Accept dispatch
   try {
     const response = await API.post("/auth/admin/login", credentials);
 
-    const { token, user } = response.data;
+    // ✅ Store only the token
+    localStorage.setItem("authToken", response.data.token);
 
-    // Save admin token and remove user token
-    localStorage.setItem("adminAuthToken", token);
-    localStorage.removeItem("userAuthToken");
+    // ✅ Fetch user details after login
+    await fetchUser(dispatch);
 
-    // Dispatch admin data to Redux store
-    dispatch(setUser({ user, role: "admin" }));
-
-    return { user, token };
+    return response.data;
   } catch (error) {
     console.error("Error in loginAdmin:", error);
     throw error.response?.data || { message: "An error occurred" };
   }
 };
 
-// Logout User/Admin
-export const logoutUser = () => {
-  localStorage.removeItem("userAuthToken");
-  localStorage.removeItem("adminAuthToken");
+// ✅ Logout User/Admin
+export const logoutUser = (dispatch) => {
+  localStorage.removeItem("authToken");
+  dispatch(setUser({ user: null })); // Clear user state in Redux
 };

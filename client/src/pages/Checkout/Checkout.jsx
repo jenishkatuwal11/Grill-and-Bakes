@@ -93,10 +93,14 @@ const Checkout = () => {
         <h3 className="text-lg font-semibold mb-2">Order Summary</h3>
         <p>Total Items: {totalQuantity}</p>
         <p className="font-bold">
-          Total Price: ₹
+          Total Price: रु{" "}
           {cartItems.reduce(
             (total, item) =>
-              total + item.quantity * parseInt(item.price.replace("₹", "")),
+              total +
+              item.quantity *
+                (typeof item.price === "string"
+                  ? parseInt(item.price.replace("₹", ""))
+                  : item.price),
             0
           )}
         </p>

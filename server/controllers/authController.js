@@ -1,15 +1,13 @@
 const User = require("../models/Users");
 const { hashPassword, matchPassword } = require("../utils/passwordUtils");
-const { generateToken } = require("../middlewares/jwtMiddlewares");
 
-// Register User
+// ✅ Register User
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // Check if the user already exists (by email or username)
+    // Check if user already exists
     const userExists = await User.findOne({ $or: [{ email }, { username }] });
-
     if (userExists) {
       return res.status(400).json({
         message:
@@ -19,34 +17,27 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // Hash the password before saving
+    // Hash password and create user
     const hashedPassword = await hashPassword(password);
-
-    // Create the new user
     const user = await User.create({
       username,
       email,
       password: hashedPassword,
-      role: "user", // Default role for regular users
+      role: "user",
     });
 
-    // Generate token
-    const token = generateToken({
-      id: user._id,
+    // ✅ Store user info in session
+    req.session.user = {
+      _id: user._id,
       username: user.username,
       email: user.email,
       role: user.role,
-    });
+    };
+    req.session.admin = null; // Remove admin session if exists
 
-    // Respond with the new user's details and a token
     res.status(201).json({
       message: "Registration successful",
-      user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-      },
-      token,
+      user: req.session.user,
     });
   } catch (error) {
     console.error("Error in registerUser:", error);
@@ -54,48 +45,41 @@ const registerUser = async (req, res) => {
   }
 };
 
-// Login User
+// ✅ Login User
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Check if the user exists
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Prevent admins from logging in via this endpoint
+    // Prevent admins from logging in here
     if (user.role === "admin") {
       return res
         .status(403)
         .json({ message: "Admins are not allowed to log in here." });
     }
 
-    // Verify the password
     const isMatch = await matchPassword(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Generate token
-    const token = generateToken({
-      id: user._id,
+    // ✅ Store user in session
+    req.session.user = {
+      _id: user._id,
       username: user.username,
       email: user.email,
       role: user.role,
-    });
+    };
 
-    // Respond with user details and a token
+    req.session.admin = null; // Clear admin session if exists
+
     res.status(200).json({
       message: "Login successful",
-      user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-      },
-      token,
+      user: req.session.user,
     });
   } catch (error) {
     console.error("Error in loginUser:", error);
@@ -103,41 +87,35 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Login Admin
+// ✅ Login Admin
 const loginAdmin = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Check if the admin exists in the database
     const admin = await User.findOne({ username, role: "admin" });
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
     }
 
-    // Verify the password
     const isMatch = await matchPassword(password, admin.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Generate token
-    const token = generateToken({
-      id: admin._id,
+    // ✅ Clear any previous user session before storing admin session
+    req.session.user = undefined;
+
+    // ✅ Store admin info in session
+    req.session.admin = {
+      _id: admin._id,
       username: admin.username,
       email: admin.email,
-      role: admin.role,
-    });
+      role: "admin",
+    };
 
-    // Respond with admin details and a token
     res.status(200).json({
       message: "Admin login successful",
-      user: {
-        _id: admin._id,
-        username: admin.username,
-        email: admin.email,
-        role: admin.role,
-      },
-      token,
+      user: req.session.admin, // ✅ Now correctly returning admin data
     });
   } catch (error) {
     console.error("Error in loginAdmin:", error);
@@ -145,4 +123,32 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, loginAdmin };
+const getAuthenticatedUser = (req, res) => {
+  if (req.session.user) {
+    return res.status(200).json({ user: req.session.user });
+  } else if (req.session.admin) {
+    return res
+      .status(403)
+      .json({ message: "Admins cannot access user pages." });
+  } else {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+};
+
+// ✅ Logout User/Admin
+const logoutUser = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Logout failed" });
+    }
+    res.status(200).json({ message: "Logged out successfully" });
+  });
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  loginAdmin,
+  logoutUser,
+  getAuthenticatedUser,
+};

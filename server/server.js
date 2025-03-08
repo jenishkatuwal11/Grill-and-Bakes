@@ -3,20 +3,38 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const path = require("path");
+const sessionMiddleware = require("./middlewares/sessionMiddleware");
 const authRoutes = require("./routes/authRoutes");
 const connectDB = require("./config/dbConnectin");
 const adminRoutes = require("./routes/adminRoute"); // Import admin routes
+const itemRoutes = require("./routes/itemRoutes"); // impoering items routes
+const cartRoutes = require("./routes/cartRoutes");
 
 const app = express();
 
 // Middleware
 // app.use(cors());
+// ✅ Configure CORS (Allow Credentials for Cookies)
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+// ✅ Apply Session Middleware
+app.use(sessionMiddleware);
 app.use(cors({ origin: "http://localhost:5173" })); // Allow requests from the client
 app.use(bodyParser.json());
 
+app.use("/uploads", express.static("uploads"));
+//app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/items", itemRoutes);
+app.use("/api/cart", cartRoutes);
 
 // Connect Database
 connectDB();
