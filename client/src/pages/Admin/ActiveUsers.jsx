@@ -1,27 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaUserLarge } from "react-icons/fa6";
 import { BsToggle2Off, BsToggle2On } from "react-icons/bs";
+import axios from "axios";
 
 const ActiveUsers = () => {
   const [filter, setFilter] = useState("all"); // Filter State
-  const [users, setUsers] = useState([
-    { id: 1, name: "Jenis Katuwal", email: "jenish@example.com", active: true },
-    { id: 2, name: "Prem Guragain", email: "prem@example.com", active: false },
-    {
-      id: 3,
-      name: "Kanchi Katuwal",
-      email: "kanchi@example.com",
-      active: true,
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await axios.get("http://localhost:8001/api/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(response.data.users || []);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
 
   // Toggle Active/Inactive Status
-  const toggleStatus = (id) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === id ? { ...user, active: !user.active } : user
-      )
-    );
+  const toggleStatus = async (id) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      await axios.put(
+        `http://localhost:8001/api/users/toggle/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === id ? { ...user, active: !user.active } : user
+        )
+      );
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+    }
   };
 
   // Filter Users Based on Active/Inactive Status
@@ -62,10 +83,10 @@ const ActiveUsers = () => {
           </thead>
           <tbody>
             {filteredUsers.map((user) => (
-              <tr key={user.id} className="border-b">
+              <tr key={user._id} className="border-b">
                 <td className="p-3 flex items-center space-x-2">
                   <FaUserLarge className="text-blue-500" />
-                  <span>{user.name}</span>
+                  <span>{user.username}</span>
                 </td>
                 <td className="p-3">{user.email}</td>
                 <td className="p-3 text-center">
@@ -86,7 +107,7 @@ const ActiveUsers = () => {
                         ? "bg-red-500 hover:bg-red-600"
                         : "bg-green-500 hover:bg-green-600"
                     }`}
-                    onClick={() => toggleStatus(user.id)}
+                    onClick={() => toggleStatus(user._id)}
                   >
                     {user.active ? <BsToggle2Off /> : <BsToggle2On />}
                   </button>
