@@ -4,48 +4,49 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    role: null,
+    admin: null,
+    token: localStorage.getItem("authToken") || null,
+    adminToken: localStorage.getItem("adminToken") || null,
   },
   reducers: {
     setUser(state, action) {
-      if (!action.payload || !action.payload.user) {
+      const { user, token } = action.payload || {};
+
+      if (!user || !token) {
         console.error(
-          "Error: Invalid user data received in setUser",
+          "❌ Error: Invalid user data received in setUser",
           action.payload
         );
         return;
       }
-      state.user = action.payload.user;
-      state.role = action.payload.role;
 
-      // ✅ Store session separately for security
-      if (state.role === "admin") {
-        localStorage.setItem("adminAuthToken", action.payload.user._id);
-        sessionStorage.setItem(
-          "adminSession",
-          JSON.stringify(action.payload.user)
-        );
+      if (user.role === "admin") {
+        state.admin = user;
+        state.adminToken = token;
+        localStorage.setItem("adminToken", token);
+        localStorage.setItem("adminData", JSON.stringify({ user }));
       } else {
-        localStorage.setItem("userAuthToken", action.payload.user._id);
-        sessionStorage.setItem(
-          "userSession",
-          JSON.stringify(action.payload.user)
-        );
+        state.user = user;
+        state.token = token;
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("userData", JSON.stringify({ user }));
       }
     },
 
-    logout(state) {
-      if (state.role === "admin") {
-        localStorage.removeItem("adminAuthToken");
-        sessionStorage.removeItem("adminSession");
-      } else {
-        localStorage.removeItem("userAuthToken");
-        sessionStorage.removeItem("userSession");
-      }
+    logout(state, action) {
+      const role = action.payload;
 
-      // ✅ Reset state
-      state.user = null;
-      state.role = null;
+      if (role === "admin") {
+        localStorage.removeItem("adminToken");
+        localStorage.removeItem("adminData");
+        state.admin = null;
+        state.adminToken = null;
+      } else {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userData");
+        state.user = null;
+        state.token = null;
+      }
     },
   },
 });

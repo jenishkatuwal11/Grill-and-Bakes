@@ -2,35 +2,60 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setUser, logout } from "../redux/slices/authSlices";
 import { fetchCart } from "../redux/slices/cartSlice";
-import API from "../services/api"; // ✅ API service imported
+import { jwtDecode } from "jwt-decode"; // ✅ Import token decoder
 import PropTypes from "prop-types";
 
 const AuthWrapper = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const checkUserSession = async () => {
-      try {
-        const response = await API.get("/auth/user", {
-          withCredentials: true, // ✅ Ensure cookies are sent
-        });
+    const restoreAuthState = () => {
+      const adminToken = localStorage.getItem("adminToken");
+      const userToken = localStorage.getItem("authToken");
+      const storedAdmin = JSON.parse(localStorage.getItem("adminData"));
+      const storedUser = JSON.parse(localStorage.getItem("userData"));
 
-        if (response.data.user && response.data.user.role === "user") {
-          dispatch(
-            setUser({ user: response.data.user, role: response.data.user.role })
-          );
+      // ✅ Check Admin Authentication First
+      if (adminToken && storedAdmin) {
+        try {
+          const decodedAdmin = jwtDecode(adminToken);
 
-          dispatch(fetchCart()); // ✅ Fetch user's cart after setting user
-        } else {
-          dispatch(logout()); // ✅ Logout if no user session or admin
+          if (decodedAdmin.exp * 1000 < Date.now()) {
+            console.warn("Admin Token expired, logging out...");
+            dispatch(logout("admin"));
+            return;
+          }
+
+          dispatch(setUser({ user: storedAdmin.user, token: adminToken }));
+          return; // ✅ Prevent checking user if admin is logged in
+        } catch (error) {
+          console.error("🔴 Error decoding admin token:", error);
+          dispatch(logout("admin"));
+          return;
         }
-      } catch (error) {
-        console.error("Error fetching user session:", error);
-        dispatch(logout()); // ✅ Ensure logout if error occurs
+      }
+
+      // ✅ Check User Authentication
+      if (userToken && storedUser) {
+        try {
+          const decodedUser = jwtDecode(userToken);
+
+          if (decodedUser.exp * 1000 < Date.now()) {
+            console.warn("User Token expired, logging out...");
+            dispatch(logout());
+            return;
+          }
+
+          dispatch(setUser({ user: storedUser.user, token: userToken }));
+          dispatch(fetchCart()); // ✅ Load cart after authentication
+        } catch (error) {
+          console.error("🔴 Error decoding user token:", error);
+          dispatch(logout());
+        }
       }
     };
 
-    checkUserSession(); // ✅ Run on mount
+    restoreAuthState();
   }, [dispatch]);
 
   return <>{children}</>;

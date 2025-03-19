@@ -1,15 +1,20 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
+import PropTypes from "prop-types"; // ✅ Import PropTypes
 
-const ProtectedRoute = () => {
-  const { user } = useSelector((state) => state.auth); // Use Redux instead of manually decoding token
+const ProtectedRoute = ({ allowedRoles }) => {
+  const { adminToken } = useSelector((state) => state.auth);
 
-  // Redirect to login if user is not authenticated
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (!adminToken) {
+    return <Navigate to="/admin/login" replace />;
   }
 
   return <Outlet />;
+};
+
+// ✅ Add PropTypes validation
+ProtectedRoute.propTypes = {
+  allowedRoles: PropTypes.arrayOf(PropTypes.string).isRequired, // Ensure `allowedRoles` is an array of strings
 };
 
 export default ProtectedRoute;

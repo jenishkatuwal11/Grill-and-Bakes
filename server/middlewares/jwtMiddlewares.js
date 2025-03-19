@@ -1,44 +1,72 @@
 const jwt = require("jsonwebtoken");
 
-// Generate Token with user details
+// ✅ Generate JWT Token (Expires in 1 day)
+// const generateToken = (payload) => {
+//   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
+// };
+
 const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "30d" });
+  try {
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    console.log("🟢 Generated Token:", token); // Debugging line
+    return token;
+  } catch (error) {
+    console.error("❌ Error generating token:", error.message);
+    return null;
+  }
 };
 
-// Verify Token Middleware
+//  Extract Token from Request
+const extractToken = (req) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.split(" ")[1]; // Extract token from 'Bearer <token>'
+  }
+  return null;
+};
+
+// ✅ Verify User Token Middleware
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = extractToken(req);
 
   if (!token) {
-    return res.status(401).json({ message: "Authorization token required" });
+    return res
+      .status(401)
+      .json({ message: "No token provided, authorization denied." });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Attach user info to request object
+    req.user = decoded; // Attach user info to request
     next();
   } catch (error) {
-    return res.status(403).json({ message: "Invalid or expired token" });
+    return res.status(403).json({ message: "Invalid or expired token." });
   }
 };
 
+// ✅ Verify Admin Token Middleware
 const verifyAdminToken = (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ message: "Authorization token required" });
-    }
+  const token = extractToken(req);
 
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "No token provided, authorization denied." });
+  }
+
+  try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (decoded.role !== "admin") {
-      return res.status(403).json({ message: "Access denied" });
+      return res.status(403).json({ message: "Access denied: Admins only." });
     }
 
-    req.user = decoded; // Attach decoded user info to request
+    req.user = decoded; // Attach admin info to request
     next();
   } catch (error) {
     console.error("Error verifying admin token:", error.message);
-    return res.status(403).json({ message: "Invalid or expired token" });
+    return res.status(403).json({ message: "Invalid or expired token." });
   }
 };
 

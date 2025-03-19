@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux"; // Add Redux hooks
-import API from "../../services/api"; // Ensure API service is imported
-import { setUser } from "../../redux/slices/authSlices"; // ✅ Ensure Redux state updates
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/slices/authSlices";
+import API from "../../services/api";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PropTypes from "prop-types";
 
@@ -10,7 +10,7 @@ const Login = ({ isOpen, onClose, switchMode }) => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const dispatch = useDispatch(); // Initialize dispatch
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -41,27 +41,23 @@ const Login = ({ isOpen, onClose, switchMode }) => {
 
     setErrors({});
     try {
-      const response = await API.post(
-        "/auth/login",
-        {
-          username: formData.username,
-          password: formData.password,
-        },
-        { withCredentials: true } // ✅ Ensure cookies are sent
-      );
+      const response = await API.post("/auth/login", {
+        username: formData.username,
+        password: formData.password,
+      });
 
-      if (response.data.user.role === "admin") {
-        setErrors({ form: "Admins are not allowed to log in here." });
-        setIsLoading(false);
-        return;
-      }
+      // ✅ Store JWT token in localStorage
+      localStorage.setItem("authToken", response.data.token);
 
-      // ✅ Store user data in Redux (No more localStorage)
+      //  Dispatch user data to Redux
       dispatch(
-        setUser({ user: response.data.user, role: response.data.user.role })
+        setUser({
+          user: response.data.user,
+          role: response.data.user.role,
+          token: response.data.token,
+        })
       );
 
-      // ✅ User profile updates instantly in Redux without reload
       setSuccessMessage("Login successful!");
 
       setTimeout(() => {
@@ -82,7 +78,7 @@ const Login = ({ isOpen, onClose, switchMode }) => {
         {/* Close Button */}
         <button
           onClick={() => {
-            setFormData({ username: "", password: "" }); // Reset form
+            setFormData({ username: "", password: "" });
             setErrors({});
             setSuccessMessage("");
             onClose();
@@ -143,6 +139,7 @@ const Login = ({ isOpen, onClose, switchMode }) => {
               </p>
             )}
           </div>
+
           {/* Password Field */}
           <div className="relative">
             <label
@@ -183,11 +180,12 @@ const Login = ({ isOpen, onClose, switchMode }) => {
               </p>
             )}
           </div>
+
           {/* Submit Button */}
           <button
             type="submit"
             className="w-full px-4 py-2 text-white bg-maroon rounded-lg hover:bg-dark-brown transition duration-300"
-            disabled={isLoading} // Disable while loading
+            disabled={isLoading}
           >
             {isLoading ? "Logging in..." : "Login"}
           </button>

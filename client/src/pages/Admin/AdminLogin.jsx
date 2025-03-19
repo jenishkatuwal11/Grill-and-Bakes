@@ -20,19 +20,23 @@ const AdminLogin = () => {
     e.preventDefault();
     try {
       const response = await API.post("/auth/admin/login", formData, {
-        withCredentials: true, // ✅ Ensure cookies are sent
+        withCredentials: true, //  Ensure cookies are sent
       });
 
       console.log("Admin Login Response:", response.data); // Debugging log
 
-      if (!response.data || !response.data.user) {
+      if (!response.data || !response.data.adminToken || !response.data.user) {
         throw new Error("Invalid response format: No user data");
       }
 
-      const { user } = response.data;
+      const { user, adminToken } = response.data;
 
       // ✅ Store admin user in Redux (No more localStorage)
-      dispatch(setUser(user));
+      dispatch(setUser({ user, token: adminToken }));
+
+      // ✅ Save to localStorage
+      localStorage.setItem("adminToken", adminToken);
+      localStorage.setItem("adminData", JSON.stringify({ user }));
 
       console.log("Admin Login Success:", user); // Debugging log
 

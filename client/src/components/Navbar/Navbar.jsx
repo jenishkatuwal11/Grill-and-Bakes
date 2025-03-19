@@ -1,26 +1,37 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../redux/slices/authSlices";
-import { fetchCart, clearCart } from "../../redux/slices/cartSlice"; // ✅ Import cart actions
+import { logout, setUser } from "../../redux/slices/authSlices";
+import { fetchCart, clearCart } from "../../redux/slices/cartSlice"; // Import cart actions
 import { useNavigate, Link } from "react-router-dom";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { FaBars, FaUserCircle } from "react-icons/fa";
 import PropTypes from "prop-types";
-import API from "../../services/api";
 import assets from "../../assets/assets";
-import CartModal from "../CartModal"; // ✅ Import Cart Modal
+import CartModal from "../CartModal"; // Import Cart Modal
 
 const Navbar = ({ toggleLoginModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false); // ✅ State for Cart Modal
+  const [isCartOpen, setIsCartOpen] = useState(false); // State for Cart Modal
 
   const { user } = useSelector((state) => state.auth);
-  const { totalQuantity } = useSelector((state) => state.cart); // ✅ Get total cart count
-
+  const { totalQuantity } = useSelector((state) => state.cart); // Get total cart count
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // ✅ Restore user from localStorage on page reload
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("userData"));
+    if (storedUser && !user) {
+      dispatch(
+        setUser({
+          user: storedUser.user,
+          token: localStorage.getItem("authToken"),
+        })
+      );
+    }
+  }, [dispatch, user]);
 
   // ✅ Fetch Cart when user logs in
   useEffect(() => {
@@ -29,11 +40,13 @@ const Navbar = ({ toggleLoginModal }) => {
     }
   }, [user, dispatch]);
 
+  // ✅ Handle Logout
   const handleLogout = async () => {
     try {
-      await API.post("/auth/logout", {}, { withCredentials: true }); // ✅ Properly destroy session
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userData"); // Ensure user data is also removed
       dispatch(logout());
-      dispatch(clearCart()); // ✅ Ensure cart is cleared on logout
+      dispatch(clearCart()); // Clear cart on logout
       setIsDropdownOpen(false);
       navigate("/");
     } catch (error) {
@@ -42,11 +55,8 @@ const Navbar = ({ toggleLoginModal }) => {
   };
 
   return (
-    <nav
-      className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 shadow-md"
-      style={{ backgroundColor: "#F5F5DC" }}
-    >
-      {/* Logo and Brand */}
+    <nav className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 shadow-md bg-[#F5F5DC]">
+      {/* ✅ Logo and Brand */}
       <div className="flex items-center space-x-3">
         <Link to="/">
           <img
@@ -63,7 +73,7 @@ const Navbar = ({ toggleLoginModal }) => {
         </div>
       </div>
 
-      {/* Links and Search Bar */}
+      {/* ✅ Links and Search Bar */}
       <div className="hidden lg:flex items-center space-x-6">
         <ul className="hidden md:flex space-x-6 lg:space-x-8 text-dark-brown">
           <li>
@@ -88,7 +98,7 @@ const Navbar = ({ toggleLoginModal }) => {
           </li>
         </ul>
 
-        {/* Search Bar */}
+        {/* ✅ Search Bar */}
         <div className="flex items-center border border-dark-brown focus-within:border-maroon rounded-full px-4 lg:px-6 w-64 lg:w-80 transition-all">
           <input
             type="text"
@@ -101,7 +111,7 @@ const Navbar = ({ toggleLoginModal }) => {
         </div>
       </div>
 
-      {/* Icons and Profile/Sign In */}
+      {/* ✅ Icons and Profile/Sign In */}
       <div className="flex items-center space-x-4 lg:space-x-6">
         {/* ✅ Cart Icon with Badge */}
         <div
@@ -116,7 +126,7 @@ const Navbar = ({ toggleLoginModal }) => {
           )}
         </div>
 
-        {/* User Profile or Sign In */}
+        {/* ✅ User Profile Dropdown */}
         {user ? (
           <div className="relative">
             <div
@@ -145,18 +155,19 @@ const Navbar = ({ toggleLoginModal }) => {
             className="px-3 py-1 sm:px-4 sm:py-1 md:px-5 md:py-2 border rounded-full text-dark-brown border-maroon hover:bg-maroon hover:text-light-beige text-sm sm:text-base md:text-lg"
             onClick={toggleLoginModal}
           >
-            Sign In
+            Log In
           </button>
         )}
 
-        {/* Hamburger Menu */}
+        {/* ✅ Hamburger Menu */}
         <button
           className="block lg:hidden"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           <FaBars className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
         </button>
-        {/*  Mobile Menu */}
+
+        {/* ✅ Mobile Menu */}
         {isMenuOpen && (
           <div className="absolute top-full right-0 w-40 bg-white shadow-md flex flex-col space-y-4 px-2 py-4 lg:hidden">
             <Link

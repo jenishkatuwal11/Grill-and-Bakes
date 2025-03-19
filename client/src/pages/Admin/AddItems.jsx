@@ -50,7 +50,7 @@ const AddItems = ({ updateHomepage }) => {
     if (image) formData.append("image", image);
 
     try {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("adminToken");
       if (!token) throw new Error("Admin token is missing");
 
       const headers = {
@@ -85,7 +85,7 @@ const AddItems = ({ updateHomepage }) => {
 
   const handleDeleteConfirm = async () => {
     try {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("adminToken");
       if (!token) throw new Error("Admin token is missing");
 
       await axios.delete(

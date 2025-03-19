@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate for redirection
+import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaSignOutAlt, FaBell } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode"; //  Import JWT decoding library
+import { useDispatch } from "react-redux";
+import { logout } from "../../../redux/slices/authSlices"; //  Import logout action
 
 const AdminNavbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [admin, setAdmin] = useState(null);
   const [notifications, setNotifications] = useState([
     { id: 1, message: "New Order from John Doe (ORD001)", read: false },
     { id: 2, message: "New Order from Alice Smith (ORD002)", read: false },
@@ -12,7 +16,43 @@ const AdminNavbar = () => {
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const navigate = useNavigate(); // ✅ Initialize navigation
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // ✅ Fetch Admin Details from `adminToken`
+  useEffect(() => {
+    const adminToken = localStorage.getItem("adminToken");
+    if (!adminToken) {
+      console.error("❌ Admin token not found in localStorage");
+      navigate("/admin/login");
+      return;
+    }
+
+    try {
+      const decodedToken = jwtDecode(adminToken);
+      console.log("🟢 Decoded Admin Token:", decodedToken);
+
+      // ✅ Redirect if role is not admin
+      if (decodedToken.role !== "admin") {
+        console.error("❌ Invalid Role! Redirecting to Admin Login...");
+        localStorage.removeItem("adminToken"); // Remove invalid token
+        navigate("/admin/login");
+      } else {
+        setAdmin(decodedToken);
+      }
+    } catch (error) {
+      console.error("❌ Invalid admin token:", error.message);
+      localStorage.removeItem("adminToken"); // Remove invalid token
+      navigate("/admin/login");
+    }
+  }, [navigate]);
+
+  // ✅ Logout Function (Admin Only)
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken"); // ✅ Remove only admin token
+    dispatch(logout("admin")); // ✅ Dispatch admin logout
+    navigate("/admin/login");
+  };
 
   // Handle Click Outside to Close Dropdowns
   useEffect(() => {
@@ -32,12 +72,6 @@ const AdminNavbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Logout Function
-  const handleLogout = () => {
-    localStorage.removeItem("adminAuthToken"); // ✅ Remove Token
-    navigate("/admin/login"); // ✅ Redirect to Admin Login
-  };
-
   // Function to mark all notifications as read
   const markAllAsRead = () => {
     setNotifications(notifications.map((n) => ({ ...n, read: true })));
@@ -47,7 +81,7 @@ const AdminNavbar = () => {
     <div className="sticky top-0 z-40 bg-slate-300 shadow-md p-4 flex justify-between items-center">
       {/* ✅ Hide Dashboard Title on sm & md screens */}
       <h1 className="text-maroon text-lg font-bold hidden md:hidden lg:block">
-        Dashboard
+        Admin Dashboard
       </h1>
 
       {/* ✅ Prevent stacking & ensure alignment */}
@@ -107,15 +141,14 @@ const AdminNavbar = () => {
             onClick={() => setDropdownOpen(!dropdownOpen)}
           >
             <FaUserCircle className="text-maroon text-2xl" />
-            <span className="block">Jenis Katuwal</span>{" "}
-            {/* ✅ Always visible */}
+            <span className="block">{admin?.username || "Admin"}</span>
           </div>
 
           {/* Profile Dropdown */}
           {dropdownOpen && (
             <div className="absolute right-0 top-full mt-2 bg-white shadow-md rounded-lg min-w-[200px] max-w-[300px] py-2 px-4">
               <p className="text-gray-700 border-b py-2 break-words whitespace-normal">
-                jenishkatuwal7@gmail.com
+                {admin?.email || "admin@example.com"}
               </p>
               <button
                 className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100"

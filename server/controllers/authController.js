@@ -1,7 +1,8 @@
 const User = require("../models/Users");
 const { hashPassword, matchPassword } = require("../utils/passwordUtils");
+const { generateToken } = require("../middlewares/jwtMiddlewares");
 
-// ✅ Register User
+// ✅ Register User with JWT
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -26,26 +27,26 @@ const registerUser = async (req, res) => {
       role: "user",
     });
 
-    // ✅ Store user info in session
-    req.session.user = {
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-    };
-    req.session.admin = null; // Remove admin session if exists
+    // Generate JWT Token
+    const token = generateToken({ id: user._id, role: user.role });
 
     res.status(201).json({
       message: "Registration successful",
-      user: req.session.user,
+      token, // ✅ Return JWT Token
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
-    console.error("Error in registerUser:", error);
+    console.error("❌ Error in registerUser:", error);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
-// ✅ Login User
+// ✅ Login User with JWT
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -67,31 +68,36 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // ✅ Store user in session
-    req.session.user = {
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-    };
-
-    req.session.admin = null; // Clear admin session if exists
+    // Generate JWT Token
+    const token = generateToken({ id: user._id, role: user.role });
 
     res.status(200).json({
       message: "Login successful",
-      user: req.session.user,
+      token, // ✅ Return JWT Token
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
-    console.error("Error in loginUser:", error);
+    console.error("❌ Error in loginUser:", error);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
-// ✅ Login Admin
+// ✅ Login Admin with JWT
 const loginAdmin = async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ message: "Username and password are required" });
+    }
+
     const admin = await User.findOne({ username, role: "admin" });
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
@@ -102,47 +108,30 @@ const loginAdmin = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // ✅ Clear any previous user session before storing admin session
-    req.session.user = undefined;
+    // Generate Admin JWT Token
+    const adminToken = generateToken({ id: admin._id, role: "admin" });
 
-    // ✅ Store admin info in session
-    req.session.admin = {
-      _id: admin._id,
-      username: admin.username,
-      email: admin.email,
-      role: "admin",
-    };
+    console.log("🟢 Admin Token Generated:", adminToken); // Debugging log
 
     res.status(200).json({
       message: "Admin login successful",
-      user: req.session.admin, // ✅ Now correctly returning admin data
+      adminToken, // ✅ Return JWT Token
+      user: {
+        id: admin._id,
+        username: admin.username,
+        email: admin.email,
+        role: "admin",
+      },
     });
   } catch (error) {
-    console.error("Error in loginAdmin:", error);
+    console.error("❌ Error in loginAdmin:", error);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
-const getAuthenticatedUser = (req, res) => {
-  if (req.session.user) {
-    return res.status(200).json({ user: req.session.user });
-  } else if (req.session.admin) {
-    return res
-      .status(403)
-      .json({ message: "Admins cannot access user pages." });
-  } else {
-    return res.status(401).json({ message: "Not authenticated" });
-  }
-};
-
-// ✅ Logout User/Admin
+// ✅ Logout User (Just clears JWT token from frontend)
 const logoutUser = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ message: "Logout failed" });
-    }
-    res.status(200).json({ message: "Logged out successfully" });
-  });
+  res.status(200).json({ message: "Logged out successfully" });
 };
 
 module.exports = {
@@ -150,5 +139,4 @@ module.exports = {
   loginUser,
   loginAdmin,
   logoutUser,
-  getAuthenticatedUser,
 };

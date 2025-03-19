@@ -3,25 +3,23 @@ const {
   registerUser,
   loginUser,
   loginAdmin,
-  getAuthenticatedUser,
-  logoutUser,
 } = require("../controllers/authController");
+const { verifyToken } = require("../middlewares/jwtMiddlewares");
 
 const router = express.Router();
 
-// ✅ Fetch authenticated user session (ONLY for users)
-router.get("/user", getAuthenticatedUser);
-
-// ✅ User Registration
+//  User Registration
 router.post("/register", registerUser);
 
-// ✅ User Login (Stores session)
+// User Login (Returns JWT Token)
 router.post("/login", loginUser);
 
-// ✅ Admin Login (Stores session)
+//  Admin Login (Returns JWT Token)
 router.post("/admin/login", loginAdmin);
 
-// ✅ Logout User/Admin (Destroy Session)
-router.post("/logout", logoutUser);
+//  Protect routes using verifyToken
+router.get("/user", verifyToken, (req, res) => {
+  res.status(200).json({ user: req.user });
+});
 
 module.exports = router;
