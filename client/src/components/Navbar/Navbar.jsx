@@ -144,7 +144,13 @@ const Navbar = ({ toggleLoginModal }) => {
                   <p className="font-semibold">{user.username}</p>
                   <p className="text-sm">{user.email}</p>
                 </div>
-                <div className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                {/* this is where user can see orders */}
+                <div className="px-4 py-2 text-gray-700 hover:bg-red-300 cursor-pointer">
+                  <Link to="/my-orders">My Orders</Link>
+                </div>
+
+                {/* this  is logout button  */}
+                <div className="px-4 py-2 text-gray-700 hover:bg-red-300 cursor-pointer">
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               </div>

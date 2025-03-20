@@ -26,6 +26,7 @@ import OrderStatus from "./pages/Admin/OrderStatus";
 import Reports from "./pages/Admin/Reports";
 import Settings from "./pages/Admin/Setting";
 import AdminLayout from "./pages/Admin/AdminLayout";
+import MyOrders from "./pages/MyOrders/MyOrders";
 
 const ProtectedRoute = ({ element, allowedRoles }) => {
   const { adminToken, token } = useSelector((state) => state.auth);
@@ -139,6 +140,7 @@ const Layout = ({
         <Route path="/mobile-app" element={<MobileApp />} />
         <Route path="/your-drink" element={<YourDrink />} />
         <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/my-orders" element={<MyOrders />} />
 
         {/* ✅ Protected Route: Only Authenticated Users */}
         <Route
