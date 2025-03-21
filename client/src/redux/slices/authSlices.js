@@ -14,7 +14,7 @@ const authSlice = createSlice({
 
       if (!user || !token) {
         console.error(
-          "❌ Error: Invalid user data received in setUser",
+          " Error: Invalid user data received in setUser",
           action.payload
         );
         return;

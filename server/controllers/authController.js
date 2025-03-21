@@ -2,7 +2,7 @@ const User = require("../models/Users");
 const { hashPassword, matchPassword } = require("../utils/passwordUtils");
 const { generateToken } = require("../middlewares/jwtMiddlewares");
 
-// ✅ Register User with JWT
+//  Register User with JWT
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -32,7 +32,7 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({
       message: "Registration successful",
-      token, // ✅ Return JWT Token
+      token, // Return JWT Token
       user: {
         id: user._id,
         username: user.username,
@@ -41,12 +41,12 @@ const registerUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error in registerUser:", error);
+    console.error(" Error in registerUser:", error);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
-// ✅ Login User with JWT
+//  Login User with JWT
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -73,7 +73,7 @@ const loginUser = async (req, res) => {
 
     res.status(200).json({
       message: "Login successful",
-      token, // ✅ Return JWT Token
+      token, //  Return JWT Token
       user: {
         id: user._id,
         username: user.username,
@@ -82,12 +82,12 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error in loginUser:", error);
+    console.error(" Error in loginUser:", error);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
-// ✅ Login Admin with JWT
+// Login Admin with JWT
 const loginAdmin = async (req, res) => {
   const { username, password } = req.body;
 
@@ -111,11 +111,9 @@ const loginAdmin = async (req, res) => {
     // Generate Admin JWT Token
     const adminToken = generateToken({ id: admin._id, role: "admin" });
 
-    console.log("🟢 Admin Token Generated:", adminToken); // Debugging log
-
     res.status(200).json({
       message: "Admin login successful",
-      adminToken, // ✅ Return JWT Token
+      adminToken, // Return JWT Token
       user: {
         id: admin._id,
         username: admin.username,
@@ -124,12 +122,12 @@ const loginAdmin = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error in loginAdmin:", error);
+    console.error(" Error in loginAdmin:", error);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
-// ✅ Logout User (Just clears JWT token from frontend)
+// Logout User (Just clears JWT token from frontend)
 const logoutUser = (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };

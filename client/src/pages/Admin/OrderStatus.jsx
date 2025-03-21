@@ -1,67 +1,58 @@
-import { useState } from "react";
-import OrderDetailsModal from "../../components/OrderDetailsModal.jsx/OrderDetailsModal"; // ✅ Import Modal Component
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import OrderDetailsModal from "../../components/OrderDetailsModal.jsx/OrderDetailsModal";
 
 const OrderStatus = () => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [orders, setOrders] = useState([
-    {
-      id: "ORD001",
-      user: "John Doe",
-      contact: "9876543210",
-      address: "123 Main St, NY",
-      status: "Out for Delivery",
-      total: "$120",
-      items: [
-        { name: "Burger", quantity: 2, price: "$20" },
-        { name: "Fries", quantity: 1, price: "$10" },
-      ],
-    },
-    {
-      id: "ORD002",
-      user: "Alice Smith",
-      contact: "9841123456",
-      address: "456 Elm St, CA",
-      status: "Delivered",
-      total: "$90",
-      items: [
-        { name: "Pizza", quantity: 1, price: "$50" },
-        { name: "Soda", quantity: 2, price: "$20" },
-      ],
-    },
-    {
-      id: "ORD003",
-      user: "Michael Brown",
-      contact: "9807654321",
-      address: "789 Oak St, TX",
-      status: "Canceled",
-      total: "$50",
-      items: [
-        { name: "Salad", quantity: 1, price: "$15" },
-        { name: "Water", quantity: 1, price: "$5" },
-      ],
-    },
-    {
-      id: "ORD004",
-      user: "Emily Davis",
-      contact: "9753124680",
-      address: "101 Pine St, FL",
-      status: "Preparing",
-      total: "$200",
-      items: [
-        { name: "Pasta", quantity: 1, price: "$30" },
-        { name: "Juice", quantity: 2, price: "$40" },
-      ],
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
+  const [loading] = useState(true);
 
-  const handleStatusChange = (id, newStatus) => {
-    setOrders(
-      orders.map((order) =>
-        order.id === id ? { ...order, status: newStatus } : order
-      )
-    );
+  const { admin } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const response = await axios.get("http://localhost:8001/api/orders", {
+        headers,
+      });
+
+      setOrders(response.data);
+    } catch (error) {
+      console.error("❌ Error fetching orders:", error);
+    }
+  };
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await axios.put(
+        `http://localhost:8001/api/orders/${id}`,
+        { status: newStatus },
+        { headers }
+      );
+
+      setOrders(
+        orders.map((order) =>
+          order._id === id ? { ...order, status: newStatus } : order
+        )
+      );
+
+      alert("Order status updated successfully!");
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      alert("Failed to update order status. Please try again.");
+    }
   };
 
   const handleDetailsClick = (order) => {
@@ -75,11 +66,15 @@ const OrderStatus = () => {
   const filteredOrders = orders.filter(
     (order) =>
       (filter === "All" || order.status === filter) &&
-      (order.id.toLowerCase().includes(search.toLowerCase()) ||
-        order.user.toLowerCase().includes(search.toLowerCase()) ||
+      (order._id.toLowerCase().includes(search.toLowerCase()) ||
+        order.user?.username?.toLowerCase().includes(search.toLowerCase()) ||
         order.contact.includes(search) ||
         order.address.toLowerCase().includes(search.toLowerCase()))
   );
+
+  if (!admin) {
+    return <p className="text-center text-red-500">Unauthorized Access</p>;
+  }
 
   return (
     <div className="p-6 md:p-8 lg:ml-64 max-w-full">
@@ -109,66 +104,70 @@ const OrderStatus = () => {
         </select>
       </div>
 
-      {/* Responsive Table */}
-      <div className="bg-white shadow-md rounded-lg overflow-x-auto">
-        <table className="w-full border-collapse min-w-max">
-          <thead>
-            <tr className="bg-gray-200 text-left text-gray-700">
-              <th className="p-3">Order ID</th>
-              <th className="p-3">User</th>
-              <th className="p-3 sm:table-cell">Contact</th>
-              <th className="p-3 md:table-cell">Address</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Total</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrders.map((order) => (
-              <tr key={order.id} className="border-t hover:bg-gray-100">
-                <td className="p-3 font-medium">{order.id}</td>
-                <td className="p-3">{order.user}</td>
-                <td className="p-3 sm:table-cell">{order.contact}</td>
-                <td className="p-3 md:table-cell">{order.address}</td>
-
-                <td className="p-3">
-                  <select
-                    className={`p-2 rounded-md text-sm ${
-                      order.status === "Out for Delivery"
-                        ? "bg-yellow-200 text-yellow-700"
-                        : order.status === "Delivered"
-                        ? "bg-green-200 text-green-700"
-                        : order.status === "Preparing"
-                        ? "bg-blue-200 text-blue-700"
-                        : "bg-red-200 text-red-700"
-                    }`}
-                    value={order.status}
-                    onChange={(e) =>
-                      handleStatusChange(order.id, e.target.value)
-                    }
-                  >
-                    <option value="Out for Delivery">Out for Delivery</option>
-                    <option value="Preparing">Preparing</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Canceled">Canceled</option>
-                  </select>
-                </td>
-
-                <td className="p-3 font-semibold">{order.total}</td>
-
-                <td className="p-3">
-                  <button
-                    className="bg-rose-600 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition"
-                    onClick={() => handleDetailsClick(order)}
-                  >
-                    Details
-                  </button>
-                </td>
+      {/* Loader */}
+      {loading ? (
+        <p className="text-center text-gray-500">Loading orders...</p>
+      ) : (
+        <div className="bg-white shadow-md rounded-lg overflow-x-auto">
+          <table className="w-full border-collapse min-w-max">
+            <thead>
+              <tr className="bg-gray-200 text-left text-gray-700">
+                <th className="p-3">Order ID</th>
+                <th className="p-3">User</th>
+                <th className="p-3 sm:table-cell">Contact</th>
+                <th className="p-3 md:table-cell">Address</th>
+                <th className="p-3">Status</th>
+                <th className="p-3">Total</th>
+                <th className="p-3">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filteredOrders.map((order) => (
+                <tr key={order._id} className="border-t hover:bg-gray-100">
+                  <td className="p-3 font-medium">{order._id}</td>
+                  <td className="p-3">{order.user?.username}</td>
+                  <td className="p-3 sm:table-cell">{order.contact}</td>
+                  <td className="p-3 md:table-cell">{order.address}</td>
+
+                  <td className="p-3">
+                    <select
+                      className={`p-2 rounded-md text-sm ${
+                        order.status === "Out for Delivery"
+                          ? "bg-yellow-200 text-yellow-700"
+                          : order.status === "Delivered"
+                          ? "bg-green-200 text-green-700"
+                          : order.status === "Preparing"
+                          ? "bg-blue-200 text-blue-700"
+                          : "bg-red-200 text-red-700"
+                      }`}
+                      value={order.status}
+                      onChange={(e) =>
+                        handleStatusChange(order._id, e.target.value)
+                      }
+                    >
+                      <option value="Out for Delivery">Out for Delivery</option>
+                      <option value="Preparing">Preparing</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Canceled">Canceled</option>
+                    </select>
+                  </td>
+
+                  <td className="p-3 font-semibold">रु {order.totalPrice}</td>
+
+                  <td className="p-3">
+                    <button
+                      className="bg-rose-600 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition"
+                      onClick={() => handleDetailsClick(order)}
+                    >
+                      Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <OrderDetailsModal order={selectedOrder} onClose={closeDetailsModal} />
     </div>

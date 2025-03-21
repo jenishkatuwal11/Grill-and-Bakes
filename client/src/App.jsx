@@ -32,12 +32,12 @@ const ProtectedRoute = ({ element, allowedRoles }) => {
   const { adminToken, token } = useSelector((state) => state.auth);
   const location = useLocation();
 
-  // ✅ Check authentication
+  //  Check authentication
   const isAuthenticated = adminToken || token;
   const isAdmin = adminToken && allowedRoles.includes("admin");
   const isUser = token && allowedRoles.includes("user");
 
-  // ✅ Redirect if not authenticated
+  //  Redirect if not authenticated
   if (!isAuthenticated) {
     return (
       <Navigate
@@ -48,7 +48,7 @@ const ProtectedRoute = ({ element, allowedRoles }) => {
     );
   }
 
-  // ✅ Redirect if role mismatch
+  //  Redirect if role mismatch
   if (!isAdmin && allowedRoles.includes("admin")) {
     return <Navigate to="/admin/login" replace />;
   }
@@ -104,7 +104,7 @@ const App = () => {
   );
 };
 
-// ✅ Pass Props to Layout Component
+//  Pass Props to Layout Component
 const Layout = ({
   isLoginOpen,
   isRegisterOpen,
@@ -117,12 +117,12 @@ const Layout = ({
 
   return (
     <>
-      {/* ✅ Hide Navbar for Admin Pages */}
+      {/*  Hide Navbar for Admin Pages */}
       {!location.pathname.startsWith("/admin") && (
         <Navbar toggleLoginModal={toggleLoginModal} />
       )}
 
-      {/* ✅ Login/Register Modals */}
+      {/*  Login/Register Modals */}
       <Login
         isOpen={isLoginOpen}
         onClose={toggleLoginModal}
@@ -135,14 +135,14 @@ const Layout = ({
       />
 
       <Routes>
-        {/* ✅ Public Routes */}
+        {/*  Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/mobile-app" element={<MobileApp />} />
         <Route path="/your-drink" element={<YourDrink />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/my-orders" element={<MyOrders />} />
 
-        {/* ✅ Protected Route: Only Authenticated Users */}
+        {/*  Protected Route: Only Authenticated Users */}
         <Route
           path="/checkout"
           element={
@@ -153,10 +153,10 @@ const Layout = ({
           }
         />
 
-        {/* ✅ Admin Login Route */}
+        {/*  Admin Login Route */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* ✅ Protected Admin Routes */}
+        {/*  Protected Admin Routes */}
         <Route
           path="/admin/*"
           element={

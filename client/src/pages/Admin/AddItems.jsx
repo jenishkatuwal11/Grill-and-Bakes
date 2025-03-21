@@ -16,7 +16,7 @@ const AddItems = ({ updateHomepage }) => {
   // Applying Filter
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // ✅ Delete Confirmation Modal State
+  //  Delete Confirmation Modal State
   const [showModal, setShowModal] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
 
@@ -77,7 +77,7 @@ const AddItems = ({ updateHomepage }) => {
     }
   };
 
-  // ✅ Open Delete Confirmation Modal
+  // Open Delete Confirmation Modal
   const handleDeleteClick = (id) => {
     setDeleteItemId(id);
     setShowModal(true);
@@ -152,7 +152,7 @@ const AddItems = ({ updateHomepage }) => {
         className="bg-white shadow-xl p-6 rounded-2xl border border-gray-200"
         onSubmit={handleSubmit}
       >
-        {/* ✅ Image Upload */}
+        {/*  Image Upload */}
         <div className="flex flex-col items-center mb-6">
           {preview ? (
             <img
@@ -176,7 +176,7 @@ const AddItems = ({ updateHomepage }) => {
           </label>
         </div>
 
-        {/* ✅ Form Fields */}
+        {/*  Form Fields */}
         <div className="space-y-4">
           <input
             type="text"
@@ -210,7 +210,7 @@ const AddItems = ({ updateHomepage }) => {
           </select>
         </div>
 
-        {/* ✅ Form Buttons */}
+        {/*  Form Buttons */}
         <div className="flex justify-between mt-6">
           <button
             type="button"
@@ -228,7 +228,7 @@ const AddItems = ({ updateHomepage }) => {
         </div>
       </form>
 
-      {/* ✅ Filter Dropdown */}
+      {/*  Filter Dropdown */}
       <div className="flex justify-end mt-6">
         <select
           className="border border-gray-300 p-2 rounded-lg"
@@ -243,7 +243,7 @@ const AddItems = ({ updateHomepage }) => {
         </select>
       </div>
 
-      {/* ✅ Menu Items List */}
+      {/*  Menu Items List */}
       <h2 className="text-3xl font-bold text-gray-800 mt-10 mb-6 text-center">
         📋 Menu Items
       </h2>
@@ -283,7 +283,7 @@ const AddItems = ({ updateHomepage }) => {
         )}
       </div>
 
-      {/* ✅ Fancy Delete Confirmation Modal */}
+      {/*  Fancy Delete Confirmation Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
@@ -312,7 +312,7 @@ const AddItems = ({ updateHomepage }) => {
   );
 };
 
-// ✅ Prop Validation
+//  Prop Validation
 AddItems.propTypes = {
   updateHomepage: PropTypes.func.isRequired,
 };

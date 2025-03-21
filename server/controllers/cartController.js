@@ -1,6 +1,6 @@
 const Cart = require("../models/cart");
 
-// ✅ Fetch Cart for Logged-in User
+// Fetch Cart for Logged-in User
 const getCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.user.id }).populate(
@@ -14,15 +14,9 @@ const getCart = async (req, res) => {
   }
 };
 
-// ✅ Add Item to Cart
+//  Add Item to Cart
 const addItemToCart = async (req, res) => {
   try {
-    console.log("🔹 Incoming Add to Cart Request:", req.body);
-    console.log(
-      "🔹 User ID:",
-      req.user ? req.user.id : "User not authenticated!"
-    );
-
     if (!req.user || !req.user.id) {
       return res
         .status(401)
@@ -59,8 +53,7 @@ const addItemToCart = async (req, res) => {
   }
 };
 
-// ✅ Increase Item Quantity
-// ✅ Increase Item Quantity
+//  Increase Item Quantity
 const increaseQuantity = async (req, res) => {
   try {
     let cart = await Cart.findOne({ userId: req.user.id });
@@ -90,8 +83,7 @@ const increaseQuantity = async (req, res) => {
   }
 };
 
-// ✅ Decrease Item Quantity
-// ✅ Decrease Item Quantity
+//  Decrease Item Quantity
 const decreaseQuantity = async (req, res) => {
   try {
     let cart = await Cart.findOne({ userId: req.user.id });
@@ -127,7 +119,7 @@ const decreaseQuantity = async (req, res) => {
   }
 };
 
-// ✅ Remove Item from Cart (DO NOT DELETE ENTIRE CART)
+//  Remove Item from Cart (DO NOT DELETE ENTIRE CART)
 const removeItemFromCart = async (req, res) => {
   try {
     let cart = await Cart.findOne({ userId: req.user.id });
@@ -150,7 +142,7 @@ const removeItemFromCart = async (req, res) => {
   }
 };
 
-// ✅ Clear Cart (ONLY IF USER CLEARS IT)
+//  Clear Cart (ONLY IF USER CLEARS IT)
 const clearCart = async (req, res) => {
   try {
     await Cart.findOneAndDelete({ userId: req.user.id });

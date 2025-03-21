@@ -1,19 +1,14 @@
 const jwt = require("jsonwebtoken");
 
-// ✅ Generate JWT Token (Expires in 1 day)
-// const generateToken = (payload) => {
-//   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
-// };
-
 const generateToken = (payload) => {
   try {
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
-    console.log("🟢 Generated Token:", token); // Debugging line
+    console.log(" Generated Token:", token); // Debugging line
     return token;
   } catch (error) {
-    console.error("❌ Error generating token:", error.message);
+    console.error(" Error generating token:", error.message);
     return null;
   }
 };
@@ -27,7 +22,7 @@ const extractToken = (req) => {
   return null;
 };
 
-// ✅ Verify User Token Middleware
+//  Verify User Token Middleware
 const verifyToken = (req, res, next) => {
   const token = extractToken(req);
 
@@ -46,7 +41,7 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// ✅ Verify Admin Token Middleware
+//  Verify Admin Token Middleware
 const verifyAdminToken = (req, res, next) => {
   const token = extractToken(req);
 

@@ -1,41 +1,79 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../../redux/slices/cartSlice";
+import { placeOrder } from "../../redux/slices/orderSlice";
 import { useNavigate } from "react-router-dom";
+import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal"; // ✅ Import Success Modal
 
 const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cartItems, totalQuantity } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.auth);
 
   const [userInfo, setUserInfo] = useState({
-    name: "",
+    name: user?.username || "",
     phone: "",
     address: "",
-    paymentMethod: "Esewa",
+    paymentMethod: "Cash On Delivery",
   });
+
+  const [loading, setLoading] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false); //  Success state
 
   const handleInputChange = (e) => {
     setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
+    if (!user) {
+      alert("You need to log in to place an order.");
+      return navigate("/login");
+    }
+
     if (!userInfo.name || !userInfo.phone || !userInfo.address) {
-      alert("Please fill all required fields");
+      alert("Please fill all required fields.");
       return;
     }
 
-    // Simulate Order Processing
-    setTimeout(() => {
-      alert("Order placed successfully!");
-      dispatch(clearCart()); // Clear cart after successful order
-      navigate("/order-confirmation");
-    }, 1000);
+    const orderData = {
+      items: cartItems.map((item) => ({
+        itemId: item.itemId || item._id, // Ensure correct ID
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      totalPrice: cartItems.reduce(
+        (total, item) => total + item.quantity * parseFloat(item.price),
+        0
+      ),
+      contact: userInfo.phone,
+      address: userInfo.address,
+    };
+
+    try {
+      setLoading(true);
+      await dispatch(placeOrder(orderData)).unwrap(); //  Dispatch Redux action
+
+      setOrderSuccess(true); //  Show Success Modal
+      dispatch(clearCart()); //  Clear cart after successful order
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert(error.message || "Failed to place order. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
       <h2 className="text-2xl font-bold text-maroon mb-4">Checkout</h2>
+
+      {/*  Success Modal */}
+      <OrderSuccessModal
+        isOpen={orderSuccess}
+        onClose={() => setOrderSuccess(false)}
+      />
 
       {/* User Details */}
       <div className="mb-4">
@@ -82,9 +120,7 @@ const Checkout = () => {
           onChange={handleInputChange}
           className="w-full p-2 border rounded-md"
         >
-          <option value="Esewa">Esewa</option>
-          <option value="Khalti">Khalti</option>
-          <option value="Card">Credit/Debit Card</option>
+          <option value="Cash On Delivery">Cash On Delivery</option>
         </select>
       </div>
 
@@ -95,12 +131,7 @@ const Checkout = () => {
         <p className="font-bold">
           Total Price: रु{" "}
           {cartItems.reduce(
-            (total, item) =>
-              total +
-              item.quantity *
-                (typeof item.price === "string"
-                  ? parseInt(item.price.replace("₹", ""))
-                  : item.price),
+            (total, item) => total + item.quantity * parseFloat(item.price),
             0
           )}
         </p>
@@ -110,8 +141,9 @@ const Checkout = () => {
       <button
         onClick={handlePlaceOrder}
         className="w-full bg-maroon text-white py-2 rounded-lg hover:bg-dark-brown"
+        disabled={loading}
       >
-        Place Order
+        {loading ? "Processing..." : "Place Order"}
       </button>
     </div>
   );

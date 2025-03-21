@@ -10,6 +10,7 @@ const adminRoutes = require("./routes/adminRoute"); // Import admin routes
 const itemRoutes = require("./routes/itemRoutes"); // impoering items routes
 const cartRoutes = require("./routes/cartRoutes");
 const userRoutes = require("./routes/userRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 
@@ -19,13 +20,14 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true })); // Allow 
 app.use(bodyParser.json());
 
 app.use("/uploads", express.static("uploads"));
-//app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/orders", orderRoutes);
 
 // Connect Database
 connectDB();

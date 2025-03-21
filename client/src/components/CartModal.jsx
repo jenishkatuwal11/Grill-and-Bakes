@@ -14,10 +14,10 @@ const CartModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
 
   const { cartItems, totalQuantity } = useSelector((state) => state.cart);
-  const user = useSelector((state) => state.auth.user); // ✅ Get user from Redux state
-  const isAuthenticated = !!user; // ✅ Check if user exists
+  const user = useSelector((state) => state.auth.user); //  Get user from Redux state
+  const isAuthenticated = !!user; //  Check if user exists
 
-  // ✅ Calculate Total Price
+  //  Calculate Total Price
   const calculateTotalPrice = () => {
     return cartItems.reduce((total, item) => {
       const price = parseFloat(
@@ -27,7 +27,7 @@ const CartModal = ({ isOpen, onClose }) => {
     }, 0);
   };
 
-  // ✅ Close modal if not open
+  //  Close modal if not open
   if (!isOpen) return null;
 
   return (
@@ -44,7 +44,7 @@ const CartModal = ({ isOpen, onClose }) => {
         {/* Modal Title */}
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Cart</h2>
 
-        {/* ✅ If User is NOT Logged In */}
+        {/*  If User is NOT Logged In */}
         {!isAuthenticated ? (
           <div className="text-center">
             <p className="text-gray-600 mb-4">
@@ -61,11 +61,11 @@ const CartModal = ({ isOpen, onClose }) => {
             </button>
           </div>
         ) : cartItems.length === 0 ? (
-          // ✅ If Cart is Empty
+          //  If Cart is Empty
           <p className="text-gray-600 text-center">Your cart is empty.</p>
         ) : (
           <div className="space-y-4">
-            {/* ✅ List of Items in Cart */}
+            {/*  List of Items in Cart */}
             {cartItems.map((item) => (
               <div
                 key={item._id} // ✅ Using item._id instead of item.name
@@ -116,13 +116,13 @@ const CartModal = ({ isOpen, onClose }) => {
               </div>
             ))}
 
-            {/* ✅ Total Items & Price */}
+            {/*  Total Items & Price */}
             <div className="flex justify-between mt-4 text-lg font-bold">
               <span>Total Items: {totalQuantity}</span>
               <span>Total: रु {calculateTotalPrice()}</span>
             </div>
 
-            {/* ✅ Checkout & Clear Cart Buttons */}
+            {/*  Checkout & Clear Cart Buttons */}
             <div className="flex flex-col space-y-3 mt-4">
               <button
                 className="w-full py-2 text-white bg-maroon rounded-lg hover:bg-dark-brown transition"
@@ -147,7 +147,7 @@ const CartModal = ({ isOpen, onClose }) => {
   );
 };
 
-// ✅ Prop Validation
+//  Prop Validation
 CartModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,

@@ -19,38 +19,38 @@ const AdminNavbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // ✅ Fetch Admin Details from `adminToken`
+  //  Fetch Admin Details from `adminToken`
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
     if (!adminToken) {
-      console.error("❌ Admin token not found in localStorage");
+      // console.error(" Admin token not found in localStorage"); to debug
       navigate("/admin/login");
       return;
     }
 
     try {
       const decodedToken = jwtDecode(adminToken);
-      console.log("🟢 Decoded Admin Token:", decodedToken);
+      // console.log(" Decoded Admin Token:", decodedToken); to debug
 
-      // ✅ Redirect if role is not admin
+      //  Redirect if role is not admin
       if (decodedToken.role !== "admin") {
-        console.error("❌ Invalid Role! Redirecting to Admin Login...");
+        // console.error(" Invalid Role! Redirecting to Admin Login..."); to debug
         localStorage.removeItem("adminToken"); // Remove invalid token
         navigate("/admin/login");
       } else {
         setAdmin(decodedToken);
       }
     } catch (error) {
-      console.error("❌ Invalid admin token:", error.message);
+      console.error(" Invalid admin token:", error.message);
       localStorage.removeItem("adminToken"); // Remove invalid token
       navigate("/admin/login");
     }
   }, [navigate]);
 
-  // ✅ Logout Function (Admin Only)
+  //  Logout Function (Admin Only)
   const handleLogout = () => {
-    localStorage.removeItem("adminToken"); // ✅ Remove only admin token
-    dispatch(logout("admin")); // ✅ Dispatch admin logout
+    localStorage.removeItem("adminToken"); //  Remove only admin token
+    dispatch(logout("admin")); //  Dispatch admin logout
     navigate("/admin/login");
   };
 
@@ -79,12 +79,12 @@ const AdminNavbar = () => {
 
   return (
     <div className="sticky top-0 z-40 bg-slate-300 shadow-md p-4 flex justify-between items-center">
-      {/* ✅ Hide Dashboard Title on sm & md screens */}
+      {/*  Hide Dashboard Title on sm & md screens */}
       <h1 className="text-maroon text-lg font-bold hidden md:hidden lg:block">
         Admin Dashboard
       </h1>
 
-      {/* ✅ Prevent stacking & ensure alignment */}
+      {/*  Prevent stacking & ensure alignment */}
       <div className="ml-auto flex items-center space-x-2 md:space-x-4">
         {/* Notification Bell */}
         <div className="relative" ref={notificationRef}>
@@ -134,7 +134,7 @@ const AdminNavbar = () => {
           )}
         </div>
 
-        {/* ✅ Admin Profile Dropdown (Visible on all screens) */}
+        {/*  Admin Profile Dropdown (Visible on all screens) */}
         <div className="relative" ref={dropdownRef}>
           <div
             className="flex items-center space-x-2 cursor-pointer"
@@ -152,7 +152,7 @@ const AdminNavbar = () => {
               </p>
               <button
                 className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100"
-                onClick={handleLogout} // ✅ Call Logout Function
+                onClick={handleLogout} //  Call Logout Function
               >
                 <FaSignOutAlt className="mr-2" /> Logout
               </button>
