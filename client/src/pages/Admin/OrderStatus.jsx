@@ -8,7 +8,7 @@ const OrderStatus = () => {
   const [filter, setFilter] = useState("All");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
-  const [loading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const { admin } = useSelector((state) => state.auth);
 
@@ -26,8 +26,9 @@ const OrderStatus = () => {
       });
 
       setOrders(response.data);
+      setLoading(false);
     } catch (error) {
-      console.error("❌ Error fetching orders:", error);
+      console.error(" Error fetching orders:", error);
     }
   };
 
