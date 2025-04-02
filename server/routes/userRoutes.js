@@ -4,10 +4,10 @@ const { getUsers, toggleUserStatus } = require("../controllers/userController");
 
 const router = express.Router();
 
-// ✅ Route to fetch all users
+//  Route to fetch all users
 router.get("/", verifyAdminToken, getUsers);
 
-// ✅ Route to toggle user active/inactive status (Optional)
+//  Route to toggle user active/inactive status (Optional)
 router.put("/toggle/:id", verifyAdminToken, toggleUserStatus);
 
 module.exports = router;

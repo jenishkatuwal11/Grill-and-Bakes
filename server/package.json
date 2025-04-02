@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "This is a food web application built as Final Year Project but to Grill & Bakes Family Restaurant",
   "dependencies": {
+    "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "connect-mongo": "^5.1.0",

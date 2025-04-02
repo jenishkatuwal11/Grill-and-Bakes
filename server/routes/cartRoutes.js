@@ -11,22 +11,22 @@ const {
 
 const router = express.Router();
 
-// ✅ Fetch Cart for Logged-in User
+//  Fetch Cart for Logged-in User
 router.get("/", verifyToken, getCart);
 
-// ✅ Add Item to Cart
+//  Add Item to Cart
 router.post("/add", verifyToken, addItemToCart);
 
-// ✅ Increase Item Quantity
+//  Increase Item Quantity
 router.post("/increase/:id", verifyToken, increaseQuantity);
 
-// ✅ Decrease Item Quantity
+//  Decrease Item Quantity
 router.post("/decrease/:id", verifyToken, decreaseQuantity);
 
-// ✅ Remove Item from Cart
+//  Remove Item from Cart
 router.delete("/remove/:id", verifyToken, removeItemFromCart);
 
-// ✅ Clear Cart (ONLY IF USER CLEARS IT)
+//  Clear Cart (ONLY IF USER CLEARS IT)
 router.delete("/clear", verifyToken, clearCart);
 
 module.exports = router;

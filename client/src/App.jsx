@@ -17,6 +17,9 @@ import Login from "./pages/Login/login";
 import Register from "./pages/Register/register";
 import AuthWrapper from "./components/AuthWrapper";
 import Checkout from "./pages/Checkout/Checkout";
+import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
+import PaymentFailed from "./pages/PaymentFailed/PaymentFailed";
+// import KhaltiVerify from "./pages/KhaltiVerify/KhaltiVerify";
 // Admin Routes
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -141,7 +144,9 @@ const Layout = ({
         <Route path="/your-drink" element={<YourDrink />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/my-orders" element={<MyOrders />} />
-
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-failed" element={<PaymentFailed />} />
+        {/* <Route path="/payment-success" element={<KhaltiVerify />} /> */}
         {/*  Protected Route: Only Authenticated Users */}
         <Route
           path="/checkout"

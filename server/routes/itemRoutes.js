@@ -11,7 +11,7 @@ const {
 
 const router = express.Router();
 
-// ✅ Setup Multer Storage
+//  Setup Multer Storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/"); // Save images in the 'uploads' folder
@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// ✅ Updated Routes
+//  Updated Routes
 router.get("/", getItems);
 router.post("/add", verifyAdminToken, upload.single("image"), addItems);
 router.put(

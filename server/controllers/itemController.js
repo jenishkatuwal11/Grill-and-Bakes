@@ -16,7 +16,7 @@ const getItems = async (req, res) => {
   }
 };
 
-// ✅ Add Items (Now Supports Image Upload)
+//  Add Items (Now Supports Image Upload)
 const addItems = async (req, res) => {
   try {
     const { name, description, price, category } = req.body;

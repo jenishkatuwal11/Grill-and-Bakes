@@ -78,7 +78,7 @@ const Navbar = ({ toggleLoginModal }) => {
         <ul className="hidden md:flex space-x-6 lg:space-x-8 text-dark-brown">
           <li>
             <Link to="/" className="hover:text-maroon">
-              Home
+              Food
             </Link>
           </li>
           <li>

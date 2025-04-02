@@ -3,13 +3,18 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../../redux/slices/cartSlice";
 import { placeOrder } from "../../redux/slices/orderSlice";
 import { useNavigate } from "react-router-dom";
-import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal"; // ✅ Import Success Modal
+import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal";
 
 const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cartItems, totalQuantity } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.auth);
+
+  const totalAmount = cartItems.reduce(
+    (total, item) => total + item.quantity * parseFloat(item.price),
+    0
+  );
 
   const [userInfo, setUserInfo] = useState({
     name: user?.username || "",
@@ -19,7 +24,7 @@ const Checkout = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false); //  Success state
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
@@ -38,25 +43,67 @@ const Checkout = () => {
 
     const orderData = {
       items: cartItems.map((item) => ({
-        itemId: item.itemId || item._id, // Ensure correct ID
+        itemId: item.itemId || item._id,
         name: item.name,
         quantity: item.quantity,
         price: item.price,
       })),
-      totalPrice: cartItems.reduce(
-        (total, item) => total + item.quantity * parseFloat(item.price),
-        0
-      ),
+      totalPrice: totalAmount,
       contact: userInfo.phone,
       address: userInfo.address,
     };
 
+    //  Khalti Payment Flow
+    if (userInfo.paymentMethod === "Khalti") {
+      const returnUrl = `http://localhost:5173/payment-success`;
+
+      //  Store order data in localStorage instead of URL
+      localStorage.setItem("pendingOrder", JSON.stringify(orderData));
+
+      console.log("Sending to Khalti backend:", {
+        amount: totalAmount * 100,
+        return_url: returnUrl,
+      });
+
+      try {
+        const response = await fetch(
+          "http://localhost:8001/api/payment/khalti/initiate",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              amount: totalAmount * 100,
+              return_url: returnUrl,
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (data && data.payment_url) {
+          // Store order data before redirecting
+          localStorage.setItem("pendingOrder", JSON.stringify(orderData));
+          window.location.href = data.payment_url;
+          return;
+        } else {
+          alert("Failed to initialize Khalti payment.");
+        }
+      } catch (error) {
+        console.error("Khalti Payment Error:", error);
+        alert("Error occurred during Khalti payment.");
+      }
+
+      return;
+    }
+
+    // ✅ Cash On Delivery Flow
     try {
       setLoading(true);
-      await dispatch(placeOrder(orderData)).unwrap(); //  Dispatch Redux action
-
-      setOrderSuccess(true); //  Show Success Modal
-      dispatch(clearCart()); //  Clear cart after successful order
+      await dispatch(placeOrder(orderData)).unwrap();
+      setOrderSuccess(true);
+      dispatch(clearCart());
     } catch (error) {
       console.error("Error placing order:", error);
       alert(error.message || "Failed to place order. Please try again.");
@@ -69,7 +116,6 @@ const Checkout = () => {
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
       <h2 className="text-2xl font-bold text-maroon mb-4">Checkout</h2>
 
-      {/*  Success Modal */}
       <OrderSuccessModal
         isOpen={orderSuccess}
         onClose={() => setOrderSuccess(false)}
@@ -111,7 +157,7 @@ const Checkout = () => {
         />
       </div>
 
-      {/* Payment Options */}
+      {/* Payment Method Dropdown */}
       <div className="mb-4">
         <label className="block text-gray-700">Payment Method</label>
         <select
@@ -121,6 +167,7 @@ const Checkout = () => {
           className="w-full p-2 border rounded-md"
         >
           <option value="Cash On Delivery">Cash On Delivery</option>
+          <option value="Khalti">Khalti</option>
         </select>
       </div>
 
@@ -128,13 +175,7 @@ const Checkout = () => {
       <div className="bg-gray-100 p-4 rounded-lg mb-4">
         <h3 className="text-lg font-semibold mb-2">Order Summary</h3>
         <p>Total Items: {totalQuantity}</p>
-        <p className="font-bold">
-          Total Price: रु{" "}
-          {cartItems.reduce(
-            (total, item) => total + item.quantity * parseFloat(item.price),
-            0
-          )}
-        </p>
+        <p className="font-bold">Total Price: रु {totalAmount.toFixed(2)}</p>
       </div>
 
       {/* Place Order Button */}

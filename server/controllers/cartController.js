@@ -44,7 +44,7 @@ const addItemToCart = async (req, res) => {
       0
     );
     await cart.save();
-    console.log("✅ Item added successfully:", cart);
+    // console.log("✅ Item added successfully:", cart);
     res.status(200).json(cart);
   } catch (error) {
     res
@@ -61,7 +61,7 @@ const increaseQuantity = async (req, res) => {
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     const existingItem = cart.cartItems.find(
-      (item) => item.itemId.toString() === req.params.id // 🔄 Changed from req.body.itemId
+      (item) => item.itemId.toString() === req.params.id //  Changed from req.body.itemId
     );
 
     if (!existingItem) {
