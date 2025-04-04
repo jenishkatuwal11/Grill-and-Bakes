@@ -77,4 +77,73 @@ const getAdminStats = async (req, res) => {
   }
 };
 
-module.exports = { getAdminStats };
+// Admin Reports Controller
+const getReports = async (req, res) => {
+  try {
+    // Filter: Only consider completed (Delivered) or Paid orders
+    const revenueFilter = {
+      $or: [
+        { paymentMethod: "Cash on Delivery", status: "Delivered" },
+        { paymentMethod: { $ne: "Cash on Delivery" }, paymentStatus: "Paid" },
+      ],
+    };
+
+    // Total Revenue
+    const totalRevenueResult = await Order.aggregate([
+      { $match: revenueFilter },
+      { $group: { _id: null, total: { $sum: "$totalPrice" } } },
+    ]);
+    const totalRevenue = totalRevenueResult[0]?.total || 0;
+
+    // Total Orders (completed or paid)
+    const totalOrders = await Order.countDocuments(revenueFilter);
+
+    // Best Selling Items
+    const orders = await Order.find(revenueFilter).populate("items.product");
+    const itemSalesMap = {};
+
+    for (const order of orders) {
+      for (const item of order.items) {
+        const name = item.product?.name || "Unknown Item";
+        itemSalesMap[name] = (itemSalesMap[name] || 0) + item.quantity;
+      }
+    }
+
+    const bestSellers = Object.entries(itemSalesMap)
+      .map(([name, sales]) => ({ name, sales }))
+      .sort((a, b) => b.sales - a.sales)
+      .slice(0, 5);
+
+    // Order Status Breakdown
+    const statusBreakdown = await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const breakdownMap = {
+      Pending: 0,
+      Preparing: 0,
+      Delivered: 0,
+      Canceled: 0,
+    };
+    statusBreakdown.forEach((s) => {
+      breakdownMap[s._id] = s.count;
+    });
+
+    res.status(200).json({
+      totalRevenue,
+      totalOrders,
+      bestSellers,
+      orderStatusData: breakdownMap,
+    });
+  } catch (err) {
+    console.error("Reports Fetch Error:", err);
+    res.status(500).json({ message: "Failed to generate reports" });
+  }
+};
+
+module.exports = { getAdminStats, getReports };

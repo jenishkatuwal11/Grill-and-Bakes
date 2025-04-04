@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -11,7 +11,6 @@ import {
   Legend,
 } from "chart.js";
 
-// Register ChartJS Components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -24,35 +23,42 @@ ChartJS.register(
 
 const Reports = () => {
   const [filter, setFilter] = useState("last30days");
+  const [reportData, setReportData] = useState({
+    totalRevenue: 0,
+    totalOrders: 0,
+    bestSellers: [],
+    orderStatusData: {
+      Pending: 0,
+      Preparing: 0,
+      Delivered: 0,
+      Canceled: 0,
+    },
+  });
 
-  // Sales Data (Dummy Data for Now)
-  const salesData = {
-    totalRevenue: "$15,230",
-    totalOrders: 325,
-    bestSellers: [
-      { name: "Cheese Burger", sales: 85 },
-      { name: "Pepperoni Pizza", sales: 72 },
-      { name: "Iced Coffee", sales: 65 },
-      { name: "Grilled Chicken", sales: 50 },
-      { name: "Pasta Alfredo", sales: 48 },
-    ],
-  };
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const res = await fetch("http://localhost:8001/api/admin/reports", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        });
+        const data = await res.json();
+        setReportData(data);
+      } catch (error) {
+        console.error("Failed to fetch reports", error);
+      }
+    };
 
-  // Order Status Breakdown (Dummy Data)
-  const orderStatusData = {
-    pending: 45,
-    preparing: 30,
-    delivered: 210,
-    canceled: 40,
-  };
+    fetchReports();
+  }, []);
 
-  // Sales Bar Chart Data
   const salesChartData = {
-    labels: salesData.bestSellers.map((item) => item.name),
+    labels: reportData.bestSellers.map((item) => item.name),
     datasets: [
       {
         label: "Best Selling Items",
-        data: salesData.bestSellers.map((item) => item.sales),
+        data: reportData.bestSellers.map((item) => item.sales),
         backgroundColor: [
           "#3B82F6",
           "#F59E0B",
@@ -64,17 +70,16 @@ const Reports = () => {
     ],
   };
 
-  // Order Status Pie Chart Data
   const orderChartData = {
     labels: ["Pending", "Preparing", "Delivered", "Canceled"],
     datasets: [
       {
         label: "Orders",
         data: [
-          orderStatusData.pending,
-          orderStatusData.preparing,
-          orderStatusData.delivered,
-          orderStatusData.canceled,
+          reportData.orderStatusData.Pending,
+          reportData.orderStatusData.Preparing,
+          reportData.orderStatusData.Delivered,
+          reportData.orderStatusData.Canceled,
         ],
         backgroundColor: ["#FBBF24", "#3B82F6", "#10B981", "#EF4444"],
       },
@@ -83,12 +88,10 @@ const Reports = () => {
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
-      {/* Header */}
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         📊 Reports & Analytics
       </h2>
 
-      {/* Filter Controls */}
       <div className="flex justify-end mb-6">
         <select
           className="border border-gray-300 p-2 rounded-lg"
@@ -101,7 +104,6 @@ const Reports = () => {
         </select>
       </div>
 
-      {/* Sales Overview */}
       <div className="bg-white shadow-lg p-6 rounded-lg mb-6">
         <h3 className="text-xl font-bold text-gray-700 mb-4">
           💰 Sales Overview
@@ -109,20 +111,18 @@ const Reports = () => {
         <p className="text-gray-600 text-lg">
           Total Revenue:{" "}
           <span className="text-green-600 font-bold">
-            {salesData.totalRevenue}
+            रु {reportData.totalRevenue}
           </span>
         </p>
         <p className="text-gray-600 text-lg">
           Total Orders:{" "}
           <span className="text-blue-600 font-bold">
-            {salesData.totalOrders}
+            {reportData.totalOrders}
           </span>
         </p>
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Best Selling Items - Bar Chart */}
         <div className="bg-white shadow-lg p-6 rounded-lg">
           <h3 className="text-xl font-bold text-gray-700 mb-4">
             🔥 Best Selling Items
@@ -130,7 +130,6 @@ const Reports = () => {
           <Bar data={salesChartData} />
         </div>
 
-        {/* Order Status Breakdown - Pie Chart */}
         <div className="bg-white shadow-lg p-6 rounded-lg">
           <h3 className="text-xl font-bold text-gray-700 mb-4">
             📦 Order Status Breakdown

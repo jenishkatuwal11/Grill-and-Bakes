@@ -1,6 +1,9 @@
 const express = require("express");
 const { verifyAdminToken } = require("../middlewares/jwtMiddlewares");
-const { getAdminStats } = require("../controllers/adminControllers");
+const {
+  getAdminStats,
+  getReports,
+} = require("../controllers/adminControllers");
 
 const router = express.Router();
 
@@ -14,5 +17,6 @@ router.get("/dashboard", verifyAdminToken, (req, res) => {
 
 router.get("/stats", verifyAdminToken, getAdminStats);
 
-// Add more admin-specific routes as needed
+router.get("/reports", verifyAdminToken, getReports); //
+
 module.exports = router;
