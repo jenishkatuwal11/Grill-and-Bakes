@@ -9,7 +9,7 @@ const PaymentSuccess = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ✅ Move useSelector outside useEffect
+  //  Move useSelector outside useEffect
   const { user } = useSelector((state) => state.auth);
 
   const [loading, setLoading] = useState(true);
@@ -23,12 +23,12 @@ const PaymentSuccess = () => {
       const orderDataString = localStorage.getItem("pendingOrder");
       const orderData = orderDataString ? JSON.parse(orderDataString) : null;
 
-      console.log("📦 Received pidx:", pidx);
-      console.log("🧾 orderData:", orderData);
-      console.log("👤 user:", user);
+      console.log(" Received pidx:", pidx);
+      console.log(" orderData:", orderData);
+      console.log(" user:", user);
 
       if (!pidx || !orderData || !user?.id) {
-        console.error("❌ Missing pidx, orderData, or userId");
+        console.error(" Missing pidx, orderData, or userId");
         alert("Missing payment verification data.");
         return navigate("/");
       }
@@ -48,19 +48,19 @@ const PaymentSuccess = () => {
         );
 
         const verifyData = await verifyRes.json();
-        console.log("✅ Khalti Verification Response:", verifyData);
+        console.log(" Khalti Verification Response:", verifyData);
 
         if (verifyData.success) {
           setSuccess(true);
           dispatch(clearCart());
           localStorage.removeItem("pendingOrder");
         } else {
-          console.error("❌ Verification failed:", verifyData);
+          console.error(" Verification failed:", verifyData);
           alert("Khalti verification failed.");
           navigate("/");
         }
       } catch (err) {
-        console.error("❌ Order Placement Error:", err);
+        console.error(" Order Placement Error:", err);
         alert("Something went wrong after payment.");
         navigate("/");
       } finally {

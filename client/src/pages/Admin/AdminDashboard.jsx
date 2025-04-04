@@ -1,11 +1,6 @@
-import { useState } from "react";
-import {
-  FaShoppingCart,
-  FaUsers,
-  FaDollarSign,
-  FaClock,
-  FaBan,
-} from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaShoppingCart, FaUsers, FaClock, FaBan } from "react-icons/fa";
+import { TbCurrencyRupeeNepalese } from "react-icons/tb";
 import { Line, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -19,7 +14,6 @@ import {
   Legend,
 } from "chart.js";
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -33,48 +27,80 @@ ChartJS.register(
 
 const AdminDashboard = () => {
   const [filter, setFilter] = useState("last7days");
+  const [dashboardData, setDashboardData] = useState({
+    totalOrders: 0,
+    activeUsers: 0,
+    totalRevenue: 0,
+    pendingOrders: 0,
+    canceledOrders: 0,
+    orderTrend: [],
+    categoryRevenue: {},
+  });
 
-  // Quick Stats Data (Added Cancel Orders)
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const res = await fetch("http://localhost:8001/api/admin/stats", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        });
+        const data = await res.json();
+        setDashboardData({
+          ...data.stats,
+          orderTrend: data.orderTrend,
+          categoryRevenue: data.categoryRevenue,
+        });
+      } catch (error) {
+        console.error("Failed to fetch dashboard data", error);
+      }
+    };
+
+    fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 60000); // every 60s
+
+    return () => clearInterval(interval); // cleanup
+  }, []);
+
   const stats = [
     {
       title: "Total Orders",
-      value: "1,250",
+      value: dashboardData.totalOrders,
       icon: <FaShoppingCart />,
       color: "bg-blue-500",
     },
     {
       title: "Active Users",
-      value: "320",
+      value: dashboardData.activeUsers,
       icon: <FaUsers />,
       color: "bg-green-500",
     },
     {
       title: "Revenue",
-      value: "$25,460",
-      icon: <FaDollarSign />,
+      value: `Rs. ${dashboardData.totalRevenue}`,
+      icon: <TbCurrencyRupeeNepalese />,
       color: "bg-yellow-500",
     },
     {
       title: "Pending Orders",
-      value: "15",
+      value: dashboardData.pendingOrders,
       icon: <FaClock />,
       color: "bg-red-500",
     },
     {
       title: "Total Orders Canceled",
-      value: "30",
+      value: dashboardData.canceledOrders,
       icon: <FaBan />,
       color: "bg-gray-500",
     },
   ];
 
-  // Line Chart Data (Orders Trend)
   const lineData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    labels: dashboardData.orderTrend.map((day) => day._id),
     datasets: [
       {
         label: "Orders",
-        data: [25, 40, 30, 50, 60, 80, 90],
+        data: dashboardData.orderTrend.map((day) => day.count),
         borderColor: "#4F46E5",
         backgroundColor: "rgba(79, 70, 229, 0.2)",
         tension: 0.4,
@@ -82,13 +108,12 @@ const AdminDashboard = () => {
     ],
   };
 
-  // Bar Chart Data (Revenue per Category)
   const barData = {
-    labels: ["Drinks", "Meals", "Snacks"],
+    labels: Object.keys(dashboardData.categoryRevenue),
     datasets: [
       {
         label: "Revenue",
-        data: [5000, 12000, 8000],
+        data: Object.values(dashboardData.categoryRevenue),
         backgroundColor: ["#10B981", "#F59E0B", "#EF4444"],
       },
     ],
@@ -96,7 +121,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 md:p-8 ml-0 md:ml-64 max-w-full">
-      {/* Dashboard Header */}
       <h1 className="text-2xl font-bold text-dark-brown text-center">
         Welcome to Admin Dashboard
       </h1>
@@ -104,7 +128,6 @@ const AdminDashboard = () => {
         Manage your orders, users, and reports here.
       </p>
 
-      {/* Filters Dropdown */}
       <div className="flex justify-end mt-6">
         <select
           className="p-2 border rounded-md"
@@ -135,15 +158,13 @@ const AdminDashboard = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Orders Trend (Line Chart) */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-xl font-bold text-gray-700 mb-4">
-            Orders Trend (Last 7 Days)
+            Orders Trend ({filter})
           </h3>
           <Line data={lineData} />
         </div>
 
-        {/* Revenue per Category (Bar Chart) */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-xl font-bold text-gray-700 mb-4">
             Revenue by Category
