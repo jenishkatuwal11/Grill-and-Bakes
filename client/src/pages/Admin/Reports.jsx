@@ -23,26 +23,39 @@ ChartJS.register(
 
 const Reports = () => {
   const [filter, setFilter] = useState("last30days");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const [reportData, setReportData] = useState({
     totalRevenue: 0,
     totalOrders: 0,
     bestSellers: [],
     orderStatusData: {
-      Pending: 0,
-      Preparing: 0,
-      Delivered: 0,
-      Canceled: 0,
+      pending: 0,
+      preparing: 0,
+      delivered: 0,
+      canceled: 0,
     },
   });
-
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await fetch("http://localhost:8001/api/admin/reports", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-          },
-        });
+        const params = new URLSearchParams({ range: filter });
+
+        if (filter === "custom" && startDate && endDate) {
+          params.set("startDate", startDate);
+          params.set("endDate", endDate);
+        }
+
+        const res = await fetch(
+          `http://localhost:8001/api/admin/reports/filter?${params.toString()}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+            },
+          }
+        );
+
         const data = await res.json();
         setReportData(data);
       } catch (error) {
@@ -51,7 +64,7 @@ const Reports = () => {
     };
 
     fetchReports();
-  }, []);
+  }, [filter, startDate, endDate]); //  clean now
 
   const salesChartData = {
     labels: reportData.bestSellers.map((item) => item.name),
@@ -76,10 +89,10 @@ const Reports = () => {
       {
         label: "Orders",
         data: [
-          reportData.orderStatusData.Pending,
-          reportData.orderStatusData.Preparing,
-          reportData.orderStatusData.Delivered,
-          reportData.orderStatusData.Canceled,
+          reportData.orderStatusData.pending,
+          reportData.orderStatusData.preparing,
+          reportData.orderStatusData.delivered,
+          reportData.orderStatusData.canceled,
         ],
         backgroundColor: ["#FBBF24", "#3B82F6", "#10B981", "#EF4444"],
       },
@@ -92,7 +105,8 @@ const Reports = () => {
         📊 Reports & Analytics
       </h2>
 
-      <div className="flex justify-end mb-6">
+      {/* Filter Controls */}
+      <div className="flex flex-wrap gap-4 justify-end items-center mb-6">
         <select
           className="border border-gray-300 p-2 rounded-lg"
           value={filter}
@@ -102,8 +116,26 @@ const Reports = () => {
           <option value="last30days">Last 30 Days</option>
           <option value="custom">Custom Date</option>
         </select>
+
+        {filter === "custom" && (
+          <>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="border p-2 rounded-lg"
+            />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="border p-2 rounded-lg"
+            />
+          </>
+        )}
       </div>
 
+      {/* Sales Overview */}
       <div className="bg-white shadow-lg p-6 rounded-lg mb-6">
         <h3 className="text-xl font-bold text-gray-700 mb-4">
           💰 Sales Overview
@@ -122,6 +154,7 @@ const Reports = () => {
         </p>
       </div>
 
+      {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white shadow-lg p-6 rounded-lg">
           <h3 className="text-xl font-bold text-gray-700 mb-4">

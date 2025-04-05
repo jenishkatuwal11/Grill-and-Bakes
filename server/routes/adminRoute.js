@@ -3,6 +3,7 @@ const { verifyAdminToken } = require("../middlewares/jwtMiddlewares");
 const {
   getAdminStats,
   getReports,
+  getAdminReports,
 } = require("../controllers/adminControllers");
 
 const router = express.Router();
@@ -17,6 +18,8 @@ router.get("/dashboard", verifyAdminToken, (req, res) => {
 
 router.get("/stats", verifyAdminToken, getAdminStats);
 
-router.get("/reports", verifyAdminToken, getReports); //
+router.get("/reports", verifyAdminToken, getReports);
+
+router.get("/reports/filter", verifyAdminToken, getAdminReports);
 
 module.exports = router;

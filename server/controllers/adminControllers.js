@@ -146,4 +146,104 @@ const getReports = async (req, res) => {
   }
 };
 
-module.exports = { getAdminStats, getReports };
+const getAdminReports = async (req, res) => {
+  try {
+    const { range, startDate, endDate } = req.query;
+
+    let fromDate;
+    let toDate = new Date(); // today
+
+    // Handle range filters
+    if (range === "last7days") {
+      fromDate = new Date();
+      fromDate.setDate(toDate.getDate() - 6);
+    } else if (range === "last30days") {
+      fromDate = new Date();
+      fromDate.setDate(toDate.getDate() - 29);
+    } else if (range === "custom" && startDate && endDate) {
+      fromDate = new Date(startDate);
+      toDate = new Date(endDate);
+    } else {
+      fromDate = new Date("2000-01-01"); // default: all time
+    }
+
+    const dateFilter = {
+      createdAt: {
+        $gte: fromDate,
+        $lte: toDate,
+      },
+    };
+
+    // Revenue: Delivered COD or Paid
+    const revenueFilter = {
+      ...dateFilter,
+      $or: [
+        { paymentMethod: "Cash on Delivery", status: "Delivered" },
+        { paymentMethod: { $ne: "Cash on Delivery" }, paymentStatus: "Paid" },
+      ],
+    };
+
+    const revenueResult = await Order.aggregate([
+      { $match: revenueFilter },
+      { $group: { _id: null, total: { $sum: "$totalPrice" } } },
+    ]);
+    const totalRevenue = revenueResult[0]?.total || 0;
+
+    // Total Orders in range
+    const totalOrders = await Order.countDocuments(dateFilter);
+
+    // Best Sellers
+    const orders = await Order.find(revenueFilter).populate("items.product");
+    const productSalesMap = {};
+
+    for (const order of orders) {
+      for (const item of order.items) {
+        const name = item.product?.name || "Unnamed";
+        productSalesMap[name] = (productSalesMap[name] || 0) + item.quantity;
+      }
+    }
+
+    const bestSellers = Object.entries(productSalesMap)
+      .map(([name, sales]) => ({ name, sales }))
+      .sort((a, b) => b.sales - a.sales)
+      .slice(0, 5); // Top 5
+
+    // Order Status Breakdown
+    const statusCounts = await Order.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const statusData = {
+      pending: 0,
+      preparing: 0,
+      delivered: 0,
+      canceled: 0,
+    };
+
+    for (const status of statusCounts) {
+      const key = status._id.toLowerCase();
+      if (statusData[key] !== undefined) {
+        statusData[key] = status.count;
+      }
+    }
+
+    // Final response
+    res.status(200).json({
+      totalRevenue,
+      totalOrders,
+      bestSellers,
+      orderStatusData: statusData,
+    });
+  } catch (err) {
+    console.error("Admin Reports Error:", err);
+    res.status(500).json({ message: "Failed to fetch reports." });
+  }
+};
+
+module.exports = { getAdminStats, getReports, getAdminReports };
