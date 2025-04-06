@@ -1,16 +1,28 @@
 const Items = require("../models/Items");
 
 // Fetch All Items
+// Fetch All Items with Pagination
 const getItems = async (req, res) => {
   try {
-    const items = await Items.find();
+    const page = parseInt(req.query.page) || 1; // default to page 1
+    const limit = parseInt(req.query.limit) || 6; // default to 6 items per page
+    const skip = (page - 1) * limit;
+
+    const totalItems = await Items.countDocuments();
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const items = await Items.find().skip(skip).limit(limit);
+
     res.status(200).json({
       items,
-      message: "Successfully fetched all items",
+      totalItems,
+      totalPages,
+      currentPage: page,
+      message: "Successfully fetched paginated items",
     });
   } catch (error) {
     res.status(500).json({
-      message: "Error fetching all items",
+      message: "Error fetching paginated items",
       error: error.message,
     });
   }

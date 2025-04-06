@@ -1,29 +1,35 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FaUserLarge } from "react-icons/fa6";
 import { BsToggle2Off, BsToggle2On } from "react-icons/bs";
 import axios from "axios";
 
 const ActiveUsers = () => {
-  const [filter, setFilter] = useState("all"); // Filter State
+  const [filter, setFilter] = useState("all");
   const [users, setUsers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  //  useCallback  fix ESLint dependency warning
+  const fetchUsers = useCallback(async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await axios.get("http://localhost:8001/api/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUsers(response.data.users || []);
+      const res = await axios.get(
+        `http://localhost:8001/api/users?page=${currentPage}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setUsers(res.data.users || []);
+      setTotalPages(res.data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  };
+  }, [currentPage]);
 
-  // Toggle Active/Inactive Status
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
   const toggleStatus = async (id) => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -45,7 +51,6 @@ const ActiveUsers = () => {
     }
   };
 
-  // Filter Users Based on Active/Inactive Status
   const filteredUsers = users.filter(
     (user) =>
       filter === "all" || (filter === "active" ? user.active : !user.active)
@@ -116,6 +121,29 @@ const ActiveUsers = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center mt-6 space-x-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="text-gray-700 font-medium">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

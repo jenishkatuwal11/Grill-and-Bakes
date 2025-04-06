@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToCart,
@@ -16,30 +16,38 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const { cartItems } = useSelector((state) => state.cart);
   const [meals, setMeals] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const limit = 8;
 
-  useEffect(() => {
-    fetchMeals();
-  }, []);
-
-  const fetchMeals = async () => {
+  const fetchMeals = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:8001/api/items");
-      console.log("API Response:", response.data);
+      const response = await axios.get(
+        `http://localhost:8001/api/items?page=${currentPage}&limit=${limit}`
+      );
 
-      if (Array.isArray(response.data.items)) {
-        const filteredMeals = response.data.items.filter(
-          (item) => item.category === "Meals"
-        );
-        setMeals(filteredMeals);
-      } else {
-        console.error("Error: API did not return an array", response.data);
-        setMeals([]);
-      }
+      const allItems = response.data.items || [];
+
+      const filteredMeals = allItems.filter((item) => {
+        const isMeal = item.category === "Meals";
+        const isMatchingCategory =
+          !selectedCategory ||
+          item.name?.toLowerCase().includes(selectedCategory.toLowerCase());
+        return isMeal && (selectedCategory ? isMatchingCategory : true);
+      });
+
+      setMeals(filteredMeals);
+      setTotalPages(response.data.totalPages || 1);
     } catch (err) {
       console.error("Error fetching meals:", err);
       setMeals([]);
     }
-  };
+  }, [currentPage, selectedCategory]);
+
+  useEffect(() => {
+    fetchMeals();
+  }, [fetchMeals]);
 
   const getItemQuantity = (itemId) => {
     const item = cartItems.find((cartItem) => cartItem.itemId === itemId);
@@ -115,6 +123,10 @@ const HomePage = () => {
               <div
                 key={index}
                 className="flex flex-col items-center text-center px-2 cursor-pointer"
+                onClick={() => {
+                  setSelectedCategory(item.name);
+                  setCurrentPage(1);
+                }}
               >
                 <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden shadow-lg">
                   <img
@@ -131,6 +143,7 @@ const HomePage = () => {
           </Slider>
         </div>
       </section>
+
       <hr className="w-3/4 mx-auto my-6 h-1 border-0 bg-gradient-to-r from-maroon to-transparent" />
 
       <section className="bg-white py-12 md:py-20 px-6 md:px-16 lg:px-32">
@@ -138,6 +151,21 @@ const HomePage = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-dark-brown mb-6">
             Top Dishes Near You
           </h2>
+          {/* View All Button */}
+          {selectedCategory && (
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setCurrentPage(1);
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-all"
+              >
+                View All
+              </button>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {meals.map((item) => (
               <div
@@ -203,6 +231,29 @@ const HomePage = () => {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex justify-center items-center mt-10 space-x-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="text-gray-700 font-medium">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         </div>
       </section>

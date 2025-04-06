@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import OrderDetailsModal from "../../components/OrderDetailsModal.jsx/OrderDetailsModal";
@@ -10,27 +10,35 @@ const OrderStatus = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
+
   const { admin } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("adminToken");
       const headers = { Authorization: `Bearer ${token}` };
 
-      const response = await axios.get("http://localhost:8001/api/orders", {
-        headers,
-      });
+      const response = await axios.get(
+        `http://localhost:8001/api/orders?page=${currentPage}&limit=${limit}`,
+        { headers }
+      );
 
-      setOrders(response.data);
+      setOrders(response.data.orders);
+      setTotalPages(response.data.totalPages);
       setLoading(false);
     } catch (error) {
-      console.error(" Error fetching orders:", error);
+      console.error("Error fetching orders:", error);
     }
-  };
+  }, [currentPage]); // ✅ memoized
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const handleStatusChange = async (id, newStatus) => {
     try {
@@ -109,65 +117,90 @@ const OrderStatus = () => {
       {loading ? (
         <p className="text-center text-gray-500">Loading orders...</p>
       ) : (
-        <div className="bg-white shadow-md rounded-lg overflow-x-auto">
-          <table className="w-full border-collapse min-w-max">
-            <thead>
-              <tr className="bg-gray-200 text-left text-gray-700">
-                <th className="p-3">Order ID</th>
-                <th className="p-3">User</th>
-                <th className="p-3 sm:table-cell">Contact</th>
-                <th className="p-3 md:table-cell">Address</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Total</th>
-                <th className="p-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.map((order) => (
-                <tr key={order._id} className="border-t hover:bg-gray-100">
-                  <td className="p-3 font-medium">{order._id}</td>
-                  <td className="p-3">{order.user?.username}</td>
-                  <td className="p-3 sm:table-cell">{order.contact}</td>
-                  <td className="p-3 md:table-cell">{order.address}</td>
-
-                  <td className="p-3">
-                    <select
-                      className={`p-2 rounded-md text-sm ${
-                        order.status === "Out for Delivery"
-                          ? "bg-yellow-200 text-yellow-700"
-                          : order.status === "Delivered"
-                          ? "bg-green-200 text-green-700"
-                          : order.status === "Preparing"
-                          ? "bg-blue-200 text-blue-700"
-                          : "bg-red-200 text-red-700"
-                      }`}
-                      value={order.status}
-                      onChange={(e) =>
-                        handleStatusChange(order._id, e.target.value)
-                      }
-                    >
-                      <option value="Out for Delivery">Out for Delivery</option>
-                      <option value="Preparing">Preparing</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Canceled">Canceled</option>
-                    </select>
-                  </td>
-
-                  <td className="p-3 font-semibold">रु {order.totalPrice}</td>
-
-                  <td className="p-3">
-                    <button
-                      className="bg-rose-600 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition"
-                      onClick={() => handleDetailsClick(order)}
-                    >
-                      Details
-                    </button>
-                  </td>
+        <>
+          <div className="bg-white shadow-md rounded-lg overflow-x-auto">
+            <table className="w-full border-collapse min-w-max">
+              <thead>
+                <tr className="bg-gray-200 text-left text-gray-700">
+                  <th className="p-3">Order ID</th>
+                  <th className="p-3">User</th>
+                  <th className="p-3 sm:table-cell">Contact</th>
+                  <th className="p-3 md:table-cell">Address</th>
+                  <th className="p-3">Status</th>
+                  <th className="p-3">Total</th>
+                  <th className="p-3">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredOrders.map((order) => (
+                  <tr key={order._id} className="border-t hover:bg-gray-100">
+                    <td className="p-3 font-medium">{order._id}</td>
+                    <td className="p-3">{order.user?.username}</td>
+                    <td className="p-3 sm:table-cell">{order.contact}</td>
+                    <td className="p-3 md:table-cell">{order.address}</td>
+
+                    <td className="p-3">
+                      <select
+                        className={`p-2 rounded-md text-sm ${
+                          order.status === "Out for Delivery"
+                            ? "bg-yellow-200 text-yellow-700"
+                            : order.status === "Delivered"
+                            ? "bg-green-200 text-green-700"
+                            : order.status === "Preparing"
+                            ? "bg-blue-200 text-blue-700"
+                            : "bg-red-200 text-red-700"
+                        }`}
+                        value={order.status}
+                        onChange={(e) =>
+                          handleStatusChange(order._id, e.target.value)
+                        }
+                      >
+                        <option value="Out for Delivery">
+                          Out for Delivery
+                        </option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Canceled">Canceled</option>
+                      </select>
+                    </td>
+
+                    <td className="p-3 font-semibold">रु {order.totalPrice}</td>
+
+                    <td className="p-3">
+                      <button
+                        className="bg-rose-600 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition"
+                        onClick={() => handleDetailsClick(order)}
+                      >
+                        Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex justify-center items-center mt-6 gap-4">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span className="text-gray-700 font-semibold">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </>
       )}
 
       <OrderDetailsModal order={selectedOrder} onClose={closeDetailsModal} />
