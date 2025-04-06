@@ -1,8 +1,8 @@
 const axios = require("axios");
 const Order = require("../models/Order");
-const Items = require("../models/Items"); // ✅ MISSING import fixed
+const Items = require("../models/Items");
 
-// ✅ Payment Verify & Place Order using pidx (Khalti E-Payment v2)
+// Payment Verify & Place Order using pidx (Khalti E-Payment v2)
 const verifyKhalti = async (req, res) => {
   const { pidx, orderData, userId } = req.body;
 
