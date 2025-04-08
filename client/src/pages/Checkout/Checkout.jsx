@@ -98,7 +98,7 @@ const Checkout = () => {
       return;
     }
 
-    // ✅ Cash On Delivery Flow
+    //  Cash On Delivery Flow
     try {
       setLoading(true);
       await dispatch(placeOrder(orderData)).unwrap();

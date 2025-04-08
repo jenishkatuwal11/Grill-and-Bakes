@@ -1,17 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// ✅ Get Auth Token
+//  Get Auth Token
 const getAuthToken = () => localStorage.getItem("authToken") || null;
 
-// ✅ Fetch Cart from Backend
+//  Fetch Cart from Backend
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("http://localhost:8001/api/cart", {
         headers: { Authorization: `Bearer ${getAuthToken()}` },
-        withCredentials: true, // ✅ Ensure session is used
+        withCredentials: true, //  Ensure session is used
       });
       return response.data;
     } catch (error) {
@@ -20,7 +20,7 @@ export const fetchCart = createAsyncThunk(
   }
 );
 
-// ✅ Add Item to Cart in Backend
+//  Add Item to Cart in Backend
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async (item, { rejectWithValue }) => {
@@ -46,7 +46,7 @@ export const addToCart = createAsyncThunk(
   }
 );
 
-// ✅ Increase Item Quantity in Backend
+//  Increase Item Quantity in Backend
 export const increaseQuantity = createAsyncThunk(
   "cart/increaseQuantity",
   async (itemId, { rejectWithValue }) => {
@@ -68,7 +68,7 @@ export const increaseQuantity = createAsyncThunk(
   }
 );
 
-// ✅ Decrease Item Quantity in Backend
+//  Decrease Item Quantity in Backend
 export const decreaseQuantity = createAsyncThunk(
   "cart/decreaseQuantity",
   async (itemId, { rejectWithValue }) => {
@@ -90,7 +90,7 @@ export const decreaseQuantity = createAsyncThunk(
   }
 );
 
-// ✅ Remove Item from Cart in Backend
+//  Remove Item from Cart in Backend
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async (itemId, { rejectWithValue }) => {
@@ -109,7 +109,7 @@ export const removeFromCart = createAsyncThunk(
   }
 );
 
-// ✅ Clear Cart in Backend (But Retain for User)
+//  Clear Cart in Backend (But Retain for User)
 export const clearCart = createAsyncThunk(
   "cart/clearCart",
   async (_, { rejectWithValue }) => {
@@ -128,7 +128,7 @@ export const clearCart = createAsyncThunk(
   }
 );
 
-// ✅ Initialize cart state
+//  Initialize cart state
 const initialState = {
   cartItems: [],
   totalQuantity: 0,
@@ -139,44 +139,44 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    // ✅ Set authentication status
+    //  Set authentication status
     setAuthentication: (state, action) => {
       state.isAuthenticated = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      // ✅ Fetch Cart Data
+      //  Fetch Cart Data
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
 
-      // ✅ Add Item to Cart
+      //  Add Item to Cart
       .addCase(addToCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
 
-      // ✅ Increase Quantity
+      //  Increase Quantity
       .addCase(increaseQuantity.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
 
-      // ✅ Decrease Quantity
+      //  Decrease Quantity
       .addCase(decreaseQuantity.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
 
-      // ✅ Remove Item from Cart
+      //  Remove Item from Cart
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
 
-      // ✅ Clear Cart (Only clears if user manually removes items)
+      //  Clear Cart (Only clears if user manually removes items)
       .addCase(clearCart.fulfilled, (state) => {
         state.cartItems = [];
         state.totalQuantity = 0;

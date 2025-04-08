@@ -1,15 +1,15 @@
 import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
-import assets from "../../assets/assets"; // Ensure the image paths are correct
+import assets from "../../assets/assets";
 
 const Footer = () => {
   return (
     <footer
       className="relative text-white"
       style={{
-        backgroundImage: `url(${assets.footerImg})`, // Use your steak image as the background
-        backgroundSize: "cover", // Ensures the background covers the entire footer
-        backgroundRepeat: "no-repeat", // Prevent repetition
-        backgroundPosition: "right center", // Keeps the steak image fixed to the right
+        backgroundImage: `url(${assets.footerImg})`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "right center",
       }}
     >
       {/* Overlay for Better Text Visibility */}

@@ -68,7 +68,7 @@ const CartModal = ({ isOpen, onClose }) => {
             {/*  List of Items in Cart */}
             {cartItems.map((item) => (
               <div
-                key={item._id} // ✅ Using item._id instead of item.name
+                key={item._id} //  Using item._id instead of item.name
                 className="flex justify-between items-center border-b pb-2"
               >
                 {/* Item Details */}

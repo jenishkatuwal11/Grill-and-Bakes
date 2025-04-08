@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setUser, logout } from "../redux/slices/authSlices";
 import { fetchCart } from "../redux/slices/cartSlice";
-import { jwtDecode } from "jwt-decode"; // ✅ Import token decoder
+import { jwtDecode } from "jwt-decode";
 import PropTypes from "prop-types";
 
 const AuthWrapper = ({ children }) => {
@@ -15,7 +15,7 @@ const AuthWrapper = ({ children }) => {
       const storedAdmin = JSON.parse(localStorage.getItem("adminData"));
       const storedUser = JSON.parse(localStorage.getItem("userData"));
 
-      // ✅ Check Admin Authentication First
+      //  Check Admin Authentication First
       if (adminToken && storedAdmin) {
         try {
           const decodedAdmin = jwtDecode(adminToken);
@@ -27,15 +27,15 @@ const AuthWrapper = ({ children }) => {
           }
 
           dispatch(setUser({ user: storedAdmin.user, token: adminToken }));
-          return; // ✅ Prevent checking user if admin is logged in
+          return; //  Prevent checking user if admin is logged in
         } catch (error) {
-          console.error("🔴 Error decoding admin token:", error);
+          console.error(" Error decoding admin token:", error);
           dispatch(logout("admin"));
           return;
         }
       }
 
-      // ✅ Check User Authentication
+      // Check User Authentication
       if (userToken && storedUser) {
         try {
           const decodedUser = jwtDecode(userToken);
@@ -47,9 +47,9 @@ const AuthWrapper = ({ children }) => {
           }
 
           dispatch(setUser({ user: storedUser.user, token: userToken }));
-          dispatch(fetchCart()); // ✅ Load cart after authentication
+          dispatch(fetchCart()); //  Load cart after authentication
         } catch (error) {
-          console.error("🔴 Error decoding user token:", error);
+          console.error(" Error decoding user token:", error);
           dispatch(logout());
         }
       }

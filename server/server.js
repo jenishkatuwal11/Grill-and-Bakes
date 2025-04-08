@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 
 app.use("/uploads", express.static("uploads"));
 
-// Routes
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/items", itemRoutes);
@@ -32,6 +32,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/contact", contactRoutes);
+
 // Connect Database
 connectDB();
 

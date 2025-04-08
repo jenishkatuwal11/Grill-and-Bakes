@@ -3,10 +3,10 @@ import { logoutUser } from "./authService"; // Ensure logout clears expired toke
 
 const API = axios.create({
   baseURL: "http://localhost:8001/api",
-  withCredentials: true, // ✅ Allow cookies (if needed)
+  withCredentials: true, //  Allow cookies (if needed)
 });
 
-// ✅ Attach JWT Token to all requests automatically
+// Attach JWT Token to all requests automatically
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authToken");
@@ -18,12 +18,12 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ Handle token expiration automatically
+// Handle token expiration automatically
 API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      console.warn("🔴 Token expired or unauthorized access!");
+      console.warn(" Token expired or unauthorized access!");
       logoutUser(); // Clear invalid token & logout user
       window.location.href = "/login"; // Redirect to login page
     }
@@ -31,23 +31,23 @@ API.interceptors.response.use(
   }
 );
 
-// ✅ Fetch Items
+//  Fetch Items
 export const fetchItems = async () => {
   const response = await API.get("/items");
   return response.data;
 };
 
-// ✅ Add Item (Requires Admin JWT Token)
+//  Add Item (Requires Admin JWT Token)
 export const addItem = async (itemData) => {
   await API.post("/items/add", itemData);
 };
 
-// ✅ Edit Item (Requires Admin JWT Token)
+//  Edit Item (Requires Admin JWT Token)
 export const editItem = async (id, updatedData) => {
   await API.put(`/items/${id}`, updatedData);
 };
 
-// ✅ Delete Item (Requires Admin JWT Token)
+//  Delete Item (Requires Admin JWT Token)
 export const deleteItem = async (id) => {
   await API.delete(`/items/${id}`);
 };

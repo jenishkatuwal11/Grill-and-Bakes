@@ -60,9 +60,24 @@ const getAllOrders = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const totalOrders = await Order.countDocuments();
+    const { startDate, endDate } = req.query;
 
-    const orders = await Order.find()
+    const query = {};
+
+    // If startDate and endDate are provided, apply date filter
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      // Adjust end to include the whole day till 23:59:59
+      end.setHours(23, 59, 59, 999);
+
+      query.createdAt = { $gte: start, $lte: end };
+    }
+
+    const totalOrders = await Order.countDocuments(query);
+
+    const orders = await Order.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -70,7 +85,12 @@ const getAllOrders = async (req, res) => {
       .populate("items.product", "name price");
 
     if (!orders || orders.length === 0) {
-      return res.status(404).json({ message: "No orders found" });
+      return res.status(200).json({
+        totalOrders: 0,
+        currentPage: page,
+        totalPages: 1,
+        orders: [],
+      });
     }
 
     res.status(200).json({

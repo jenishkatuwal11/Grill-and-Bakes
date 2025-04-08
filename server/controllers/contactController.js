@@ -20,7 +20,7 @@ const handleContactForm = async (req, res) => {
     await sendEmail(process.env.EMAIL_USER, subject, text, html);
     res.status(200).json({ message: "Email sent successfully!" });
   } catch (error) {
-    console.error("❌ Email send error:", error);
+    console.error(" Email send error:", error);
     res.status(500).json({ message: "Failed to send email" });
   }
 };

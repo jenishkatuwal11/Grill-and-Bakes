@@ -20,7 +20,7 @@ const Navbar = ({ toggleLoginModal }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ✅ Restore user from localStorage on page reload
+  //  Restore user from localStorage on page reload
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userData"));
     if (storedUser && !user) {
@@ -33,14 +33,14 @@ const Navbar = ({ toggleLoginModal }) => {
     }
   }, [dispatch, user]);
 
-  // ✅ Fetch Cart when user logs in
+  //  Fetch Cart when user logs in
   useEffect(() => {
     if (user) {
       dispatch(fetchCart());
     }
   }, [user, dispatch]);
 
-  // ✅ Handle Logout
+  //  Handle Logout
   const handleLogout = async () => {
     try {
       localStorage.removeItem("authToken");
@@ -56,7 +56,7 @@ const Navbar = ({ toggleLoginModal }) => {
 
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 shadow-md bg-[#F5F5DC]">
-      {/* ✅ Logo and Brand */}
+      {/*  Logo and Brand */}
       <div className="flex items-center space-x-3">
         <Link to="/">
           <img
@@ -73,7 +73,7 @@ const Navbar = ({ toggleLoginModal }) => {
         </div>
       </div>
 
-      {/* ✅ Links and Search Bar */}
+      {/*  Links and Search Bar */}
       <div className="hidden lg:flex items-center space-x-6">
         <ul className="hidden md:flex space-x-6 lg:space-x-8 text-dark-brown">
           <li>
@@ -98,7 +98,7 @@ const Navbar = ({ toggleLoginModal }) => {
           </li>
         </ul>
 
-        {/* ✅ Search Bar */}
+        {/*  Search Bar */}
         <div className="flex items-center border border-dark-brown focus-within:border-maroon rounded-full px-4 lg:px-6 w-64 lg:w-80 transition-all">
           <input
             type="text"
@@ -111,9 +111,9 @@ const Navbar = ({ toggleLoginModal }) => {
         </div>
       </div>
 
-      {/* ✅ Icons and Profile/Sign In */}
+      {/*  Icons and Profile/Sign In */}
       <div className="flex items-center space-x-4 lg:space-x-6">
-        {/* ✅ Cart Icon with Badge */}
+        {/*  Cart Icon with Badge */}
         <div
           className="relative cursor-pointer"
           onClick={() => setIsCartOpen(true)}
@@ -126,7 +126,7 @@ const Navbar = ({ toggleLoginModal }) => {
           )}
         </div>
 
-        {/* ✅ User Profile Dropdown */}
+        {/*  User Profile Dropdown */}
         {user ? (
           <div className="relative">
             <div
@@ -165,7 +165,7 @@ const Navbar = ({ toggleLoginModal }) => {
           </button>
         )}
 
-        {/* ✅ Hamburger Menu */}
+        {/*  Hamburger Menu */}
         <button
           className="block lg:hidden"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -173,7 +173,7 @@ const Navbar = ({ toggleLoginModal }) => {
           <FaBars className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
         </button>
 
-        {/* ✅ Mobile Menu */}
+        {/*  Mobile Menu */}
         {isMenuOpen && (
           <div className="absolute top-full right-0 w-40 bg-white shadow-md flex flex-col space-y-4 px-2 py-4 lg:hidden">
             <Link
@@ -208,7 +208,7 @@ const Navbar = ({ toggleLoginModal }) => {
         )}
       </div>
 
-      {/* ✅ Cart Modal */}
+      {/*  Cart Modal */}
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>
   );

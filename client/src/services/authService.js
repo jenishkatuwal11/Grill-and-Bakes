@@ -64,26 +64,26 @@ export const loginUser = async (credentials, dispatch) => {
 export const loginAdmin = async (credentials, dispatch, navigate) => {
   try {
     const response = await API.post("/auth/admin/login", credentials);
-    console.log("🟢 Admin Login Response:", response.data);
+    console.log(" Admin Login Response:", response.data);
 
     const { adminToken, user } = response.data; // Ensure both values exist
 
     if (!adminToken || !user) {
-      console.error("❌ Missing adminToken or user data in API response");
+      console.error(" Missing adminToken or user data in API response");
       return;
     }
 
-    // ✅ Ensure adminToken is stored properly
+    //  Ensure adminToken is stored properly
     localStorage.setItem("adminToken", adminToken);
     localStorage.setItem("adminData", JSON.stringify({ user }));
 
-    // ✅ Dispatch admin data to Redux store
+    //  Dispatch admin data to Redux store
     dispatch(setUser({ user, token: adminToken }));
 
-    // ✅ Redirect to admin dashboard
+    //  Redirect to admin dashboard
     navigate("/admin/dashboard");
   } catch (error) {
-    console.error("❌ Error in loginAdmin:", error);
+    console.error(" Error in loginAdmin:", error);
   }
 };
 
