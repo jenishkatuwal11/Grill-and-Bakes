@@ -1,17 +1,55 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-//  Get Auth Token
+// Get Auth Token
 const getAuthToken = () => localStorage.getItem("authToken") || null;
 
-//  Fetch Cart from Backend
+// Utility to calculate additional cost based on customizations
+const calculateCustomizationCost = (item) => {
+  const defaults = {
+    "Iced Blended Caramel Frappe": {
+      milk: "Whole milk",
+      sweetness: "Regular",
+      ice: "Regular ice",
+      caramel: " ",
+      whippedCream: "With whipped cream",
+    },
+    "Cafe Mocha Madness": {
+      milk: "Whole milk",
+      espresso: "Double shot",
+      sweetness: "Regular",
+      chocolate: "Dark chocolate",
+    },
+  };
+
+  const pricePerCustomization = 10;
+  let additionalCost = 0;
+  const selected = item.customizations || {};
+  const drinkDefaults = defaults[item.name] || {};
+
+  for (const key in selected) {
+    if (key === "toppings" && Array.isArray(selected.toppings)) {
+      additionalCost += selected.toppings.length * pricePerCustomization;
+    } else if (
+      selected[key] &&
+      drinkDefaults[key] &&
+      selected[key] !== drinkDefaults[key]
+    ) {
+      additionalCost += pricePerCustomization;
+    }
+  }
+
+  return additionalCost;
+};
+
+// Fetch Cart
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("http://localhost:8001/api/cart", {
         headers: { Authorization: `Bearer ${getAuthToken()}` },
-        withCredentials: true, //  Ensure session is used
+        withCredentials: true,
       });
       return response.data;
     } catch (error) {
@@ -20,19 +58,31 @@ export const fetchCart = createAsyncThunk(
   }
 );
 
-//  Add Item to Cart in Backend
+// Add to Cart
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async (item, { rejectWithValue }) => {
     try {
+      // If item.price is already customized (from modal), don't add again
+      const extraCost = item.customizations
+        ? calculateCustomizationCost(item)
+        : 0;
+
+      const finalPrice =
+        item.customizations && item.price
+          ? item.price // already has customization cost included
+          : item.price + extraCost;
+
       const response = await axios.post(
         "http://localhost:8001/api/cart/add",
         {
           itemId: item._id,
           name: item.name,
-          price: item.price,
+          price: finalPrice,
           img: item.image,
           quantity: 1,
+          customizations: item.customizations || {},
+          customizationCost: extraCost,
         },
         {
           headers: { Authorization: `Bearer ${getAuthToken()}` },
@@ -46,7 +96,7 @@ export const addToCart = createAsyncThunk(
   }
 );
 
-//  Increase Item Quantity in Backend
+// Increase Quantity
 export const increaseQuantity = createAsyncThunk(
   "cart/increaseQuantity",
   async (itemId, { rejectWithValue }) => {
@@ -68,13 +118,13 @@ export const increaseQuantity = createAsyncThunk(
   }
 );
 
-//  Decrease Item Quantity in Backend
+// Decrease Quantity
 export const decreaseQuantity = createAsyncThunk(
   "cart/decreaseQuantity",
   async (itemId, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `http://localhost:8001/api/cart/decrease/${itemId}`, // `http://localhost:8001/api/cart/remove/${itemId}`,
+        `http://localhost:8001/api/cart/decrease/${itemId}`,
         {},
         {
           headers: { Authorization: `Bearer ${getAuthToken()}` },
@@ -90,7 +140,7 @@ export const decreaseQuantity = createAsyncThunk(
   }
 );
 
-//  Remove Item from Cart in Backend
+// Remove Item
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async (itemId, { rejectWithValue }) => {
@@ -109,7 +159,7 @@ export const removeFromCart = createAsyncThunk(
   }
 );
 
-//  Clear Cart in Backend (But Retain for User)
+// Clear Cart
 export const clearCart = createAsyncThunk(
   "cart/clearCart",
   async (_, { rejectWithValue }) => {
@@ -128,7 +178,6 @@ export const clearCart = createAsyncThunk(
   }
 );
 
-//  Initialize cart state
 const initialState = {
   cartItems: [],
   totalQuantity: 0,
@@ -139,44 +188,32 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    //  Set authentication status
     setAuthentication: (state, action) => {
       state.isAuthenticated = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      //  Fetch Cart Data
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
-
-      //  Add Item to Cart
       .addCase(addToCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
-
-      //  Increase Quantity
       .addCase(increaseQuantity.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
-
-      //  Decrease Quantity
       .addCase(decreaseQuantity.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
-
-      //  Remove Item from Cart
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.cartItems || [];
         state.totalQuantity = action.payload.totalQuantity || 0;
       })
-
-      //  Clear Cart (Only clears if user manually removes items)
       .addCase(clearCart.fulfilled, (state) => {
         state.cartItems = [];
         state.totalQuantity = 0;

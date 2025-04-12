@@ -47,6 +47,7 @@ const Checkout = () => {
         name: item.name,
         quantity: item.quantity,
         price: item.price,
+        customizations: item.customizations || {},
       })),
       totalPrice: totalAmount,
       contact: userInfo.phone,

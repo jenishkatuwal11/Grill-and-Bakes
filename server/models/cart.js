@@ -18,6 +18,12 @@ const cartSchema = new mongoose.Schema({
       price: Number,
       quantity: Number,
       img: String,
+
+      //  Added this:
+      customizations: {
+        type: Object,
+        default: {},
+      },
     },
   ],
   totalQuantity: {

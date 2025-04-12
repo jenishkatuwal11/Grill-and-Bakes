@@ -30,9 +30,12 @@ const createOrder = async (req, res) => {
         product: product._id,
         name: product.name,
         quantity: item.quantity,
-        price: product.price,
+        //price: product.price,
+        price: item.price, // this includes the customization cost
+        customizations: item.customizations || {}, //store customizations
       };
     });
+    console.log("Item to be added to order:", enrichedItems); // Debugging line
 
     // Create the order with enriched items
     const newOrder = new Order({

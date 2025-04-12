@@ -81,6 +81,30 @@ const MyOrders = () => {
     }).format(date);
   };
 
+  const renderCustomizations = (customizations) => {
+    if (!customizations || typeof customizations !== "object") return null;
+
+    return (
+      <ul className="text-xs text-gray-500 mt-1 list-disc list-inside space-y-0.5">
+        {Object.entries(customizations).map(([key, value]) => {
+          if (!value || value.length === 0) return null;
+          const formattedValue = Array.isArray(value)
+            ? value.join(", ")
+            : value;
+          const formattedKey =
+            key.charAt(0).toUpperCase() +
+            key.slice(1).replace(/([A-Z])/g, " $1");
+          return (
+            <li key={key}>
+              <span className="font-medium text-gray-600">{formattedKey}:</span>{" "}
+              {formattedValue}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center h-64 p-6">
@@ -120,8 +144,8 @@ const MyOrders = () => {
             No Orders Yet
           </h3>
           <p className="text-gray-600 max-w-md mx-auto">
-            You haven&apost placed any orders yet. Browse our menu and place
-            your first order!
+            You haven’t placed any orders yet. Browse our menu and place your
+            first order!
           </p>
         </div>
       ) : (
@@ -167,7 +191,7 @@ const MyOrders = () => {
                       {order.status}
                     </span>
                     <span className="ml-4 font-bold text-gray-800">
-                      रु {order.totalPrice}
+                      ₹{order.totalPrice}
                     </span>
                     <svg
                       className={`w-5 h-5 ml-2 transition-transform duration-200 ${
@@ -188,10 +212,11 @@ const MyOrders = () => {
                 </div>
               </div>
 
-              {/* Order Details (expandable) */}
+              {/* Order Details */}
               {selectedOrder === order._id && (
                 <div className="p-4 bg-gray-50 border-b border-gray-100">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    {/* Order Info */}
                     <div className="bg-white p-4 rounded-lg shadow-sm">
                       <h4 className="font-medium text-gray-700 mb-2 flex items-center">
                         <FaCalendarAlt className="text-gray-400 mr-2" />
@@ -232,25 +257,48 @@ const MyOrders = () => {
                       </ul>
                     </div>
 
+                    {/* Enhanced Payment Summary */}
                     <div className="bg-white p-4 rounded-lg shadow-sm">
                       <h4 className="font-medium text-gray-700 mb-2 flex items-center">
                         <FaReceipt className="text-gray-400 mr-2" />
                         Payment Summary
                       </h4>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Subtotal:</span>
-                          <span className="font-medium">
-                            रु {order.totalPrice}
-                          </span>
-                        </div>
+                        {order.items.map((item, idx) => {
+                          const base = item.product?.price || 0;
+                          const customizationCost = item.price - base;
+                          const hasCustomization = customizationCost > 0;
+
+                          return (
+                            <div
+                              key={idx}
+                              className="flex justify-between items-start border-b border-gray-100 pb-2"
+                            >
+                              <div>
+                                <span className="font-medium text-gray-700">
+                                  {item.name} × {item.quantity}
+                                </span>
+                                {hasCustomization && (
+                                  <p className="text-xs text-gray-500">
+                                    Base: ₹{base} + Custom: ₹{customizationCost}
+                                  </p>
+                                )}
+                              </div>
+                              <span className="font-semibold text-gray-800">
+                                ₹{item.price}
+                              </span>
+                            </div>
+                          );
+                        })}
+
                         <div className="flex justify-between">
                           <span className="text-gray-600">Delivery Fee:</span>
-                          <span className="font-medium">रु 0</span>
+                          <span className="font-medium">₹0</span>
                         </div>
+
                         <div className="border-t border-gray-100 mt-2 pt-2 flex justify-between font-bold">
                           <span>Total:</span>
-                          <span>रु {order.totalPrice}</span>
+                          <span>₹{order.totalPrice}</span>
                         </div>
                       </div>
                     </div>
@@ -264,7 +312,7 @@ const MyOrders = () => {
                     {order.items.map((item, index) => (
                       <div
                         key={`${item.product?._id}-${index}`}
-                        className={`flex items-center p-3 ${
+                        className={`flex items-start p-3 ${
                           index !== order.items.length - 1
                             ? "border-b border-gray-100"
                             : ""
@@ -277,7 +325,7 @@ const MyOrders = () => {
                                 ? `http://localhost:8001${item.product.image}`
                                 : "/fallback-image.jpg"
                             }
-                            alt={item.product?.name || "Food Item"}
+                            alt={item.product?.name || "Item"}
                             className="w-full h-full object-cover"
                             onError={(e) =>
                               (e.target.src = "/fallback-image.jpg")
@@ -286,18 +334,19 @@ const MyOrders = () => {
                         </div>
                         <div className="ml-4 flex-1">
                           <h5 className="font-medium text-gray-800">
-                            {item.product?.name || "Unknown Item"}
+                            {item.name}
                           </h5>
                           <p className="text-sm text-gray-500">
                             Quantity: {item.quantity}
                           </p>
+                          {renderCustomizations(item.customizations)}
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-gray-800">
-                            रु {item.price}
+                            ₹{item.price}
                           </p>
                           <p className="text-sm text-gray-500">
-                            रु {(item.price / item.quantity).toFixed(2)} each
+                            ₹{(item.price / item.quantity).toFixed(2)} each
                           </p>
                         </div>
                       </div>

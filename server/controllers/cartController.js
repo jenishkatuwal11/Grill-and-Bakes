@@ -14,7 +14,7 @@ const getCart = async (req, res) => {
   }
 };
 
-//  Add Item to Cart
+// Add Item to Cart
 const addItemToCart = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
@@ -23,28 +23,46 @@ const addItemToCart = async (req, res) => {
         .json({ message: "Unauthorized: No user ID found!" });
     }
 
-    const { itemId, name, price, img, quantity = 1 } = req.body;
-    var cart = await Cart.findOne({ userId: req.user.id });
+    const {
+      itemId,
+      name,
+      price,
+      img,
+      quantity = 1,
+      customizations = {}, // ✅ Destructure this
+    } = req.body;
+
+    let cart = await Cart.findOne({ userId: req.user.id });
 
     if (!cart) {
       cart = new Cart({ userId: req.user.id, cartItems: [], totalQuantity: 0 });
     }
 
     const existingItem = cart.cartItems.find(
-      (item) => item.itemId.toString() === itemId
+      (item) =>
+        item.itemId.toString() === itemId &&
+        JSON.stringify(item.customizations) === JSON.stringify(customizations)
     );
+
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
-      cart.cartItems.push({ itemId, name, price, quantity, img });
+      cart.cartItems.push({
+        itemId,
+        name,
+        price,
+        quantity,
+        img,
+        customizations, // ✅ Save customizations
+      });
     }
 
     cart.totalQuantity = cart.cartItems.reduce(
       (sum, item) => sum + item.quantity,
       0
     );
+
     await cart.save();
-    // console.log("✅ Item added successfully:", cart);
     res.status(200).json(cart);
   } catch (error) {
     res
@@ -53,7 +71,7 @@ const addItemToCart = async (req, res) => {
   }
 };
 
-//  Increase Item Quantity
+// Increase Quantity
 const increaseQuantity = async (req, res) => {
   try {
     let cart = await Cart.findOne({ userId: req.user.id });
@@ -61,7 +79,7 @@ const increaseQuantity = async (req, res) => {
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     const existingItem = cart.cartItems.find(
-      (item) => item.itemId.toString() === req.params.id //  Changed from req.body.itemId
+      (item) => item.itemId.toString() === req.params.id
     );
 
     if (!existingItem) {
@@ -69,6 +87,7 @@ const increaseQuantity = async (req, res) => {
     }
 
     existingItem.quantity += 1;
+
     cart.totalQuantity = cart.cartItems.reduce(
       (sum, item) => sum + item.quantity,
       0
@@ -83,7 +102,7 @@ const increaseQuantity = async (req, res) => {
   }
 };
 
-//  Decrease Item Quantity
+// Decrease Quantity
 const decreaseQuantity = async (req, res) => {
   try {
     let cart = await Cart.findOne({ userId: req.user.id });
@@ -91,7 +110,7 @@ const decreaseQuantity = async (req, res) => {
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     const existingItem = cart.cartItems.find(
-      (item) => item.itemId.toString() === req.params.id // 🔄 Changed from req.body.itemId
+      (item) => item.itemId.toString() === req.params.id
     );
 
     if (!existingItem) {
@@ -110,6 +129,7 @@ const decreaseQuantity = async (req, res) => {
       (sum, item) => sum + item.quantity,
       0
     );
+
     await cart.save();
     res.status(200).json(cart);
   } catch (error) {
@@ -119,7 +139,7 @@ const decreaseQuantity = async (req, res) => {
   }
 };
 
-//  Remove Item from Cart (DO NOT DELETE ENTIRE CART)
+// Remove Item from Cart
 const removeItemFromCart = async (req, res) => {
   try {
     let cart = await Cart.findOne({ userId: req.user.id });
@@ -128,6 +148,7 @@ const removeItemFromCart = async (req, res) => {
     cart.cartItems = cart.cartItems.filter(
       (item) => item.itemId.toString() !== req.params.id
     );
+
     cart.totalQuantity = cart.cartItems.reduce(
       (sum, item) => sum + item.quantity,
       0
@@ -142,7 +163,7 @@ const removeItemFromCart = async (req, res) => {
   }
 };
 
-//  Clear Cart (ONLY IF USER CLEARS IT)
+// Clear Cart
 const clearCart = async (req, res) => {
   try {
     await Cart.findOneAndDelete({ userId: req.user.id });

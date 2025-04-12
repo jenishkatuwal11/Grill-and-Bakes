@@ -14,10 +14,9 @@ const CartModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
 
   const { cartItems, totalQuantity } = useSelector((state) => state.cart);
-  const user = useSelector((state) => state.auth.user); //  Get user from Redux state
-  const isAuthenticated = !!user; //  Check if user exists
+  const user = useSelector((state) => state.auth.user);
+  const isAuthenticated = !!user;
 
-  //  Calculate Total Price
   const calculateTotalPrice = () => {
     return cartItems.reduce((total, item) => {
       const price = parseFloat(
@@ -27,13 +26,43 @@ const CartModal = ({ isOpen, onClose }) => {
     }, 0);
   };
 
-  //  Close modal if not open
   if (!isOpen) return null;
+
+  const renderCustomizations = (customizations) => {
+    if (!customizations || typeof customizations !== "object") return null;
+
+    const hasCustoms = Object.values(customizations).some(
+      (val) =>
+        (Array.isArray(val) && val.length > 0) || (!Array.isArray(val) && val)
+    );
+
+    if (!hasCustoms) return null;
+
+    return (
+      <ul className="text-xs text-gray-600 list-disc ml-4 mt-1">
+        {Object.entries(customizations).map(([key, value]) => {
+          if (!value || (Array.isArray(value) && value.length === 0))
+            return null;
+
+          const formattedKey =
+            key.charAt(0).toUpperCase() +
+            key.slice(1).replace(/([A-Z])/g, " $1");
+          const displayValue = Array.isArray(value) ? value.join(", ") : value;
+
+          return (
+            <li key={key}>
+              <span className="font-medium text-gray-700">{formattedKey}:</span>{" "}
+              {displayValue}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white w-11/12 max-w-lg p-6 rounded-lg shadow-lg relative">
-        {/* Close Modal Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition"
@@ -41,10 +70,8 @@ const CartModal = ({ isOpen, onClose }) => {
           &times;
         </button>
 
-        {/* Modal Title */}
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Cart</h2>
 
-        {/*  If User is NOT Logged In */}
         {!isAuthenticated ? (
           <div className="text-center">
             <p className="text-gray-600 mb-4">
@@ -52,7 +79,7 @@ const CartModal = ({ isOpen, onClose }) => {
             </p>
             <button
               onClick={() => {
-                onClose(); // Close modal before navigating
+                onClose();
                 navigate("/login");
               }}
               className="bg-maroon text-white py-2 px-4 rounded-lg hover:bg-dark-brown transition"
@@ -61,18 +88,15 @@ const CartModal = ({ isOpen, onClose }) => {
             </button>
           </div>
         ) : cartItems.length === 0 ? (
-          //  If Cart is Empty
           <p className="text-gray-600 text-center">Your cart is empty.</p>
         ) : (
           <div className="space-y-4">
-            {/*  List of Items in Cart */}
             {cartItems.map((item) => (
               <div
-                key={item._id} //  Using item._id instead of item.name
-                className="flex justify-between items-center border-b pb-2"
+                key={item._id}
+                className="flex justify-between items-start border-b pb-2"
               >
-                {/* Item Details */}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-start space-x-4">
                   <img
                     src={
                       item.img
@@ -87,11 +111,13 @@ const CartModal = ({ isOpen, onClose }) => {
                   />
                   <div>
                     <h3 className="text-lg font-semibold">{item.name}</h3>
-                    <p className="text-maroon font-bold">रु {item.price}</p>
+                    {renderCustomizations(item.customizations)}
+                    <p className="text-maroon font-bold mt-1">
+                      रु {item.price}
+                    </p>
                   </div>
                 </div>
 
-                {/* Quantity Controls */}
                 <div className="flex items-center space-x-2">
                   <button
                     className="w-8 h-8 flex items-center justify-center text-white bg-red-500 rounded-full hover:bg-red-600"
@@ -116,18 +142,16 @@ const CartModal = ({ isOpen, onClose }) => {
               </div>
             ))}
 
-            {/*  Total Items & Price */}
             <div className="flex justify-between mt-4 text-lg font-bold">
               <span>Total Items: {totalQuantity}</span>
               <span>Total: रु {calculateTotalPrice()}</span>
             </div>
 
-            {/*  Checkout & Clear Cart Buttons */}
             <div className="flex flex-col space-y-3 mt-4">
               <button
                 className="w-full py-2 text-white bg-maroon rounded-lg hover:bg-dark-brown transition"
                 onClick={() => {
-                  onClose(); // Close modal on checkout
+                  onClose();
                   navigate("/checkout");
                 }}
               >
@@ -147,7 +171,6 @@ const CartModal = ({ isOpen, onClose }) => {
   );
 };
 
-//  Prop Validation
 CartModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
