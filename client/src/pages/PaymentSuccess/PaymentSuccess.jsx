@@ -27,10 +27,19 @@ const PaymentSuccess = () => {
       console.log(" orderData:", orderData);
       console.log(" user:", user);
 
-      if (!pidx || !orderData || !user?.id) {
-        console.error(" Missing pidx, orderData, or userId");
-        alert("Missing payment verification data.");
+      if (!pidx) {
+        console.error("Missing pidx from URL");
+        alert("Missing payment ID.");
         return navigate("/");
+      }
+      if (!orderData) {
+        console.warn("No order data found in localStorage");
+        alert("Order session expired. Please try again.");
+        return navigate("/");
+      }
+      if (!user?.id) {
+        console.warn("User not available yet");
+        return;
       }
 
       try {
@@ -56,13 +65,11 @@ const PaymentSuccess = () => {
           localStorage.removeItem("pendingOrder");
         } else {
           console.error(" Verification failed:", verifyData);
-          alert("Khalti verification failed.");
-          navigate("/");
+          setSuccess(false);
         }
       } catch (err) {
         console.error(" Order Placement Error:", err);
-        alert("Something went wrong after payment.");
-        navigate("/");
+        setSuccess(false);
       } finally {
         setLoading(false);
       }

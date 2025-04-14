@@ -33,6 +33,7 @@ const verifyKhalti = async (req, res) => {
           name: product?.name || "Unknown",
           price: product?.price || 0,
           quantity: i.quantity,
+          customizations: i.customizations || {},
         };
       });
 
