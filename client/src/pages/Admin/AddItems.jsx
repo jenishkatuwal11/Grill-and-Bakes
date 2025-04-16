@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import PropTypes from "prop-types"; // ✅ Import PropTypes
+import PropTypes from "prop-types";
 import { FaUpload, FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 
@@ -13,17 +13,18 @@ const AddItems = ({ updateHomepage }) => {
   const [items, setItems] = useState([]);
   const [editId, setEditId] = useState(null);
 
-  // Applying Filter
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  //  Delete Confirmation Modal State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(8);
+
   const [showModal, setShowModal] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
 
   useEffect(() => {
     fetchItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Add empty string to avoid infinite loop of fetching data
+  }, []);
 
   const fetchItems = async () => {
     try {
@@ -77,7 +78,6 @@ const AddItems = ({ updateHomepage }) => {
     }
   };
 
-  // Open Delete Confirmation Modal
   const handleDeleteClick = (id) => {
     setDeleteItemId(id);
     setShowModal(true);
@@ -137,22 +137,43 @@ const AddItems = ({ updateHomepage }) => {
     }
   };
 
-  // Handling filter
+  // Filtering Items
   const filteredItems =
     selectedCategory === "All"
       ? items
       : items.filter((item) => item.category === selectedCategory);
+
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredItems.length / limit);
+  const paginatedItems = filteredItems.slice(
+    (currentPage - 1) * limit,
+    currentPage * limit
+  );
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  console.log(
+    "Filtered Items:",
+    filteredItems.length,
+    "Total Pages:",
+    totalPages
+  ); // Debugging line
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         ✨ {editId ? "Edit" : "Add"} Menu Item
       </h2>
+
+      {/* Form */}
       <form
         className="bg-white shadow-xl p-6 rounded-2xl border border-gray-200"
         onSubmit={handleSubmit}
       >
-        {/*  Image Upload */}
         <div className="flex flex-col items-center mb-6">
           {preview ? (
             <img
@@ -176,7 +197,7 @@ const AddItems = ({ updateHomepage }) => {
           </label>
         </div>
 
-        {/*  Form Fields */}
+        {/* Form Inputs */}
         <div className="space-y-4">
           <input
             type="text"
@@ -210,7 +231,6 @@ const AddItems = ({ updateHomepage }) => {
           </select>
         </div>
 
-        {/*  Form Buttons */}
         <div className="flex justify-between mt-6">
           <button
             type="button"
@@ -228,12 +248,15 @@ const AddItems = ({ updateHomepage }) => {
         </div>
       </form>
 
-      {/*  Filter Dropdown */}
+      {/* Filter Dropdown */}
       <div className="flex justify-end mt-6">
         <select
           className="border border-gray-300 p-2 rounded-lg"
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            setCurrentPage(1); // Reset to page 1 when category changes
+          }}
         >
           <option value="All">All</option>
           <option value="Drinks">Custom Drinks</option>
@@ -243,13 +266,13 @@ const AddItems = ({ updateHomepage }) => {
         </select>
       </div>
 
-      {/*  Menu Items List */}
+      {/* Menu Items List */}
       <h2 className="text-3xl font-bold text-gray-800 mt-10 mb-6 text-center">
         📋 Menu Items
       </h2>
       <div className="space-y-4">
-        {filteredItems.length > 0 ? (
-          filteredItems.map((item) => (
+        {paginatedItems.length > 0 ? (
+          paginatedItems.map((item) => (
             <div
               key={item._id}
               className="bg-white shadow-md p-5 rounded-lg flex items-center space-x-5 border border-gray-200"
@@ -283,7 +306,40 @@ const AddItems = ({ updateHomepage }) => {
         )}
       </div>
 
-      {/*  Fancy Delete Confirmation Modal */}
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8 space-x-2">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => handlePageChange(i + 1)}
+              className={`px-4 py-2 rounded ${
+                currentPage === i + 1
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
@@ -312,7 +368,6 @@ const AddItems = ({ updateHomepage }) => {
   );
 };
 
-//  Prop Validation
 AddItems.propTypes = {
   updateHomepage: PropTypes.func.isRequired,
 };

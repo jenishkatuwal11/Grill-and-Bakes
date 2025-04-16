@@ -19,17 +19,15 @@ const HomePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const limit = 8;
+  const limit = 16;
 
   const fetchMeals = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8001/api/items?page=${currentPage}&limit=${limit}`
-      );
+      const response = await axios.get("http://localhost:8001/api/items");
 
       const allItems = response.data.items || [];
 
-      const filteredMeals = allItems.filter((item) => {
+      const filtered = allItems.filter((item) => {
         const isMeal = item.category === "Meals";
         const isMatchingCategory =
           !selectedCategory ||
@@ -37,8 +35,14 @@ const HomePage = () => {
         return isMeal && (selectedCategory ? isMatchingCategory : true);
       });
 
-      setMeals(filteredMeals);
-      setTotalPages(response.data.totalPages || 1);
+      setTotalPages(Math.ceil(filtered.length / limit));
+
+      const paginatedItems = filtered.slice(
+        (currentPage - 1) * limit,
+        currentPage * limit
+      );
+
+      setMeals(paginatedItems);
     } catch (err) {
       console.error("Error fetching meals:", err);
       setMeals([]);
@@ -151,7 +155,7 @@ const HomePage = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-dark-brown mb-6">
             Top Dishes Near You
           </h2>
-          {/* View All Button */}
+
           {selectedCategory && (
             <div className="flex justify-end mb-4">
               <button

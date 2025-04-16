@@ -1,26 +1,29 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, setUser } from "../../redux/slices/authSlices";
-import { fetchCart, clearCart } from "../../redux/slices/cartSlice"; // Import cart actions
+import { fetchCart, clearCart } from "../../redux/slices/cartSlice";
 import { useNavigate, Link } from "react-router-dom";
 import { IoFastFoodOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { FaBars, FaUserCircle } from "react-icons/fa";
 import PropTypes from "prop-types";
 import assets from "../../assets/assets";
-import CartModal from "../CartModal"; // Import Cart Modal
+import CartModal from "../CartModal";
+import axios from "axios";
 
 const Navbar = ({ toggleLoginModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false); // State for Cart Modal
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
-  const { totalQuantity } = useSelector((state) => state.cart); // Get total cart count
+  const { totalQuantity } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  //  Restore user from localStorage on page reload
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userData"));
     if (storedUser && !user) {
@@ -33,20 +36,18 @@ const Navbar = ({ toggleLoginModal }) => {
     }
   }, [dispatch, user]);
 
-  //  Fetch Cart when user logs in
   useEffect(() => {
     if (user) {
       dispatch(fetchCart());
     }
   }, [user, dispatch]);
 
-  //  Handle Logout
   const handleLogout = async () => {
     try {
       localStorage.removeItem("authToken");
-      localStorage.removeItem("userData"); // Ensure user data is also removed
+      localStorage.removeItem("userData");
       dispatch(logout());
-      dispatch(clearCart()); // Clear cart on logout
+      dispatch(clearCart());
       setIsDropdownOpen(false);
       navigate("/");
     } catch (error) {
@@ -54,9 +55,28 @@ const Navbar = ({ toggleLoginModal }) => {
     }
   };
 
+  // 🔍 Handle Enter key press
+  const handleSearchKeyPress = async (e) => {
+    if (e.key === "Enter") {
+      try {
+        const res = await axios.get("http://localhost:8001/api/items");
+        const allItems = res.data.items || [];
+
+        const filtered = allItems.filter((item) =>
+          item.name.toLowerCase().includes(search.toLowerCase())
+        );
+
+        setSearchResults(filtered);
+        setShowDropdown(true);
+      } catch (error) {
+        console.error("Search error:", error);
+      }
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 shadow-md bg-[#F5F5DC]">
-      {/*  Logo and Brand */}
+      {/* Brand */}
       <div className="flex items-center space-x-3">
         <Link to="/">
           <img
@@ -73,7 +93,7 @@ const Navbar = ({ toggleLoginModal }) => {
         </div>
       </div>
 
-      {/*  Links and Search Bar */}
+      {/* Nav Links and Search */}
       <div className="hidden lg:flex items-center space-x-6">
         <ul className="hidden md:flex space-x-6 lg:space-x-8 text-dark-brown">
           <li>
@@ -98,22 +118,49 @@ const Navbar = ({ toggleLoginModal }) => {
           </li>
         </ul>
 
-        {/*  Search Bar */}
-        <div className="flex items-center border border-dark-brown focus-within:border-maroon rounded-full px-4 lg:px-6 w-64 lg:w-80 transition-all">
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full outline-none text-dark-brown placeholder-dark-brown text-sm lg:text-base bg-transparent"
-          />
-          <button>
+        {/* 🔍 Search Input */}
+        <div className="relative">
+          <div className="flex items-center border border-dark-brown focus-within:border-maroon rounded-full px-4 lg:px-6 w-64 lg:w-80 transition-all">
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full outline-none text-dark-brown placeholder-dark-brown text-sm lg:text-base bg-transparent"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={handleSearchKeyPress}
+              onFocus={() => setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+            />
             <IoIosSearch className="text-maroon w-6 h-6 lg:w-7 lg:h-10 ml-2 lg:ml-4" />
-          </button>
+          </div>
+
+          {/* ⬇️ Search Results Dropdown */}
+          {showDropdown && (
+            <div className="absolute top-full left-0 mt-2 w-full max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg z-20">
+              {searchResults.length === 0 ? (
+                <p className="p-3 text-gray-500 text-sm">No items found.</p>
+              ) : (
+                searchResults.map((item) => (
+                  <div
+                    key={item._id}
+                    className="px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => {
+                      setSearch("");
+                      setShowDropdown(false);
+                      navigate(`/item/${item._id}`); // 🔁 implement item page if needed
+                    }}
+                  >
+                    {item.name}
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/*  Icons and Profile/Sign In */}
+      {/* Cart & User */}
       <div className="flex items-center space-x-4 lg:space-x-6">
-        {/*  Cart Icon with Badge */}
         <div
           className="relative cursor-pointer"
           onClick={() => setIsCartOpen(true)}
@@ -126,7 +173,7 @@ const Navbar = ({ toggleLoginModal }) => {
           )}
         </div>
 
-        {/*  User Profile Dropdown */}
+        {/* User Dropdown */}
         {user ? (
           <div className="relative">
             <div
@@ -144,12 +191,9 @@ const Navbar = ({ toggleLoginModal }) => {
                   <p className="font-semibold">{user.username}</p>
                   <p className="text-sm">{user.email}</p>
                 </div>
-                {/* this is where user can see orders */}
                 <div className="px-4 py-2 text-gray-700 hover:bg-red-300 cursor-pointer">
                   <Link to="/my-orders">My Orders</Link>
                 </div>
-
-                {/* this  is logout button  */}
                 <div className="px-4 py-2 text-gray-700 hover:bg-red-300 cursor-pointer">
                   <button onClick={handleLogout}>Logout</button>
                 </div>
@@ -165,50 +209,49 @@ const Navbar = ({ toggleLoginModal }) => {
           </button>
         )}
 
-        {/*  Hamburger Menu */}
         <button
           className="block lg:hidden"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           <FaBars className="w-6 h-6 sm:w-7 sm:h-7 text-maroon" />
         </button>
-
-        {/*  Mobile Menu */}
-        {isMenuOpen && (
-          <div className="absolute top-full right-0 w-40 bg-white shadow-md flex flex-col space-y-4 px-2 py-4 lg:hidden">
-            <Link
-              to="/"
-              className="text-dark-brown hover:text-maroon"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              to="/your-drink"
-              className="text-dark-brown hover:text-maroon"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Your Drink
-            </Link>
-            <Link
-              to="/mobile-app"
-              className="text-dark-brown hover:text-maroon"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Mobile App
-            </Link>
-            <Link
-              to="/contact-us"
-              className="text-dark-brown hover:text-maroon"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Contact Us
-            </Link>
-          </div>
-        )}
       </div>
 
-      {/*  Cart Modal */}
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="absolute top-full right-0 w-40 bg-white shadow-md flex flex-col space-y-4 px-2 py-4 lg:hidden">
+          <Link
+            to="/"
+            className="text-dark-brown hover:text-maroon"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Home
+          </Link>
+          <Link
+            to="/your-drink"
+            className="text-dark-brown hover:text-maroon"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Your Drink
+          </Link>
+          <Link
+            to="/mobile-app"
+            className="text-dark-brown hover:text-maroon"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Mobile App
+          </Link>
+          <Link
+            to="/contact-us"
+            className="text-dark-brown hover:text-maroon"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Contact Us
+          </Link>
+        </div>
+      )}
+
+      {/* Cart Modal */}
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>
   );
