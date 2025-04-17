@@ -1,4 +1,4 @@
-import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
+import { FaFacebookF, FaInstagram } from "react-icons/fa";
 import assets from "../../assets/assets";
 
 const Footer = () => {
@@ -23,20 +23,20 @@ const Footer = () => {
           <p className="text-lg font-medium mb-4">
             <strong>Hours of Operation:</strong>
             <br />
-            Monday-Saturday: 11 A.M. to 2 P.M.
+            Monday-Saturday: 09 A.M. to 9:30 P.M.
             <br />
-            Thursday-Saturday: 5 P.M. to 8 P.M.
+            Thursday-Saturday: 09 A.M. to 9:30 P.M.
           </p>
           <p className="text-md mb-4">
-            1611 Farnam Street
+            Kapan marg - Chakrapath,
             <br />
-            Omaha, Nebraska 68106
+            Kathmandu, Nepal-44600
             <br />
             <a
               href="mailto:block16info@gmail.com"
               className="hover:text-maroon underline"
             >
-              block16info@gmail.com
+              info.grillandbakes@gmail.com
             </a>
           </p>
           <p className="text-md mb-4">
@@ -45,28 +45,17 @@ const Footer = () => {
           </p>
           <div className="flex space-x-4 mt-4">
             <a
-              href="#"
+              href="https://www.facebook.com/Grillandbakes/"
               className="w-8 h-8 flex items-center justify-center rounded-full bg-dark-brown hover:bg-maroon"
             >
               <FaFacebookF className="text-white w-4 h-4" />
             </a>
+
             <a
-              href="#"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-dark-brown hover:bg-maroon"
-            >
-              <FaTwitter className="text-white w-4 h-4" />
-            </a>
-            <a
-              href="#"
+              href="https://www.instagram.com/grillandbakes/?fbclid=IwY2xjawJtfZdleHRuA2FlbQIxMAABHjLw8_IEpdJelPWJu5WIbFqo42n2RXp-r3oLAHOnXyOs167wvktlGzypYQHr_aem_6zQoMyw85yAtj5heVg0iUg#"
               className="w-8 h-8 flex items-center justify-center rounded-full bg-dark-brown hover:bg-maroon"
             >
               <FaInstagram className="text-white w-4 h-4" />
-            </a>
-            <a
-              href="#"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-dark-brown hover:bg-maroon"
-            >
-              <FaYoutube className="text-white w-4 h-4" />
             </a>
           </div>
         </div>
@@ -75,7 +64,7 @@ const Footer = () => {
       {/* Bottom Section */}
       <div className="bg-dark-gray bg-opacity-90 py-4 relative z-10">
         <p className="text-center text-sm text-white font-medium">
-          © 2024 Grill & Bakes | All Rights Reserved
+          © 2025 Grill & Bakes | All Rights Reserved
         </p>
       </div>
     </footer>

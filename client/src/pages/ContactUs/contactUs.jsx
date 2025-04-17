@@ -239,8 +239,7 @@ const ContactUs = () => {
                       Our Location
                     </h3>
                     <p className="text-gray-600">
-                      123 Restaurant Avenue, Culinary District, Foodville, FC
-                      12345
+                      Kapan marg - Chakrapath, Kathmandu, Nepal 44600
                     </p>
                   </div>
                 </div>
@@ -253,8 +252,8 @@ const ContactUs = () => {
                     <h3 className="font-medium text-lg text-gray-800 mb-1">
                       Phone Number
                     </h3>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
-                    <p className="text-gray-600">+1 (555) 765-4321</p>
+                    <p className="text-gray-600">+977 01-4017680</p>
+                    <p className="text-gray-600">+977 984-1475282</p>
                   </div>
                 </div>
 
@@ -266,8 +265,10 @@ const ContactUs = () => {
                     <h3 className="font-medium text-lg text-gray-800 mb-1">
                       Email Address
                     </h3>
-                    <p className="text-gray-600">info@restaurant.com</p>
-                    <p className="text-gray-600">support@restaurant.com</p>
+                    <p className="text-gray-600">
+                      info.grillandbakes@gmail.com
+                    </p>
+                    {/* <p className="text-gray-600">support@restaurant.com</p> */}
                   </div>
                 </div>
               </div>
@@ -282,44 +283,32 @@ const ContactUs = () => {
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span>Monday - Friday</span>
-                  <span className="font-medium">8:00 AM - 10:00 PM</span>
+                  <span className="font-medium">09:00 AM - 09:30 PM</span>
                 </div>
                 <div className="h-px bg-white/20"></div>
                 <div className="flex justify-between">
                   <span>Saturday</span>
-                  <span className="font-medium">9:00 AM - 11:00 PM</span>
+                  <span className="font-medium">09:00 AM - 09:30 PM</span>
                 </div>
                 <div className="h-px bg-white/20"></div>
                 <div className="flex justify-between">
                   <span>Sunday</span>
-                  <span className="font-medium">10:00 AM - 9:00 PM</span>
+                  <span className="font-medium">09:00 AM - 09:30 PM</span>
                 </div>
               </div>
 
               <div className="mt-8 flex justify-center space-x-4">
                 <a
-                  href="#"
+                  href="https://www.facebook.com/Grillandbakes/"
                   className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
                 >
                   <i className="fab fa-facebook-f text-white"></i>
                 </a>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/grillandbakes/?fbclid=IwY2xjawJtfZdleHRuA2FlbQIxMAABHjLw8_IEpdJelPWJu5WIbFqo42n2RXp-r3oLAHOnXyOs167wvktlGzypYQHr_aem_6zQoMyw85yAtj5heVg0iUg#"
                   className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
                 >
                   <i className="fab fa-instagram text-white"></i>
-                </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-                >
-                  <i className="fab fa-twitter text-white"></i>
-                </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-                >
-                  <i className="fab fa-yelp text-white"></i>
                 </a>
               </div>
             </div>
