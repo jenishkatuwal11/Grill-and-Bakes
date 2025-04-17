@@ -38,7 +38,7 @@ const getAdminStats = async (req, res) => {
       {
         $group: {
           _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }, // e.g., "2025-04-02"
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
           },
           count: { $sum: 1 },
         },

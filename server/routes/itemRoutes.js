@@ -7,6 +7,7 @@ const {
   addItems,
   updateItems,
   deleteItems,
+  getItemById,
 } = require("../controllers/itemController");
 
 const router = express.Router();
@@ -33,5 +34,7 @@ router.put(
   updateItems
 );
 router.delete("/delete/:id", verifyAdminToken, deleteItems);
+
+router.get("/:id", getItemById);
 
 module.exports = router;

@@ -147,7 +147,7 @@ const Navbar = ({ toggleLoginModal }) => {
                     onClick={() => {
                       setSearch("");
                       setShowDropdown(false);
-                      navigate(`/item/${item._id}`); // 🔁 implement item page if needed
+                      navigate(`/item/${item._id}`); //  implement item page if needed
                     }}
                   >
                     {item.name}

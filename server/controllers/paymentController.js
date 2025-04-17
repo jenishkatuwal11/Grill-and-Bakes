@@ -40,7 +40,7 @@ const verifyKhalti = async (req, res) => {
       // 3. Create enriched order
       const newOrder = new Order({
         user: userId,
-        items: enrichedItems, // ✅ Use enriched version
+        items: enrichedItems,
         totalPrice: orderData.totalPrice,
         contact: orderData.contact,
         address: orderData.address,
@@ -70,7 +70,7 @@ const verifyKhalti = async (req, res) => {
   }
 };
 
-// ✅ Initiate Payment
+//  Initiate Payment
 const initiateKhalti = async (req, res) => {
   const { amount, return_url } = req.body;
 

@@ -1,11 +1,10 @@
 const Items = require("../models/Items");
 
 // Fetch All Items
-// Fetch All Items with Pagination
-// Fetch All Items without Pagination
+
 const getItems = async (req, res) => {
   try {
-    const items = await Items.find(); // 🔥 fetch all items
+    const items = await Items.find();
 
     res.status(200).json({
       items,
@@ -19,11 +18,11 @@ const getItems = async (req, res) => {
   }
 };
 
-//  Add Items (Now Supports Image Upload)
+//  Add Items By Admin Only
 const addItems = async (req, res) => {
   try {
     const { name, description, price, category } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null; // ✅ Save image path
+    const image = req.file ? `/uploads/${req.file.filename}` : null;
 
     // Check if item already exists
     const existingItem = await Items.findOne({ name });
@@ -109,4 +108,21 @@ const deleteItems = async (req, res) => {
   }
 };
 
-module.exports = { getItems, addItems, updateItems, deleteItems };
+//  Get a single item by ID
+const getItemById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = await Items.findById(id);
+
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    res.status(200).json(item);
+  } catch (error) {
+    console.error("Error fetching item:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = { getItems, addItems, updateItems, deleteItems, getItemById };

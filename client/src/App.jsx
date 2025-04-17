@@ -30,7 +30,7 @@ import Reports from "./pages/Admin/Reports";
 import Settings from "./pages/Admin/Setting";
 import AdminLayout from "./pages/Admin/AdminLayout";
 import MyOrders from "./pages/MyOrders/MyOrders";
-
+import ItemDetails from "./pages/ItemDetails/ItemDetails";
 const ProtectedRoute = ({ element, allowedRoles }) => {
   const { adminToken, token } = useSelector((state) => state.auth);
   const location = useLocation();
@@ -146,6 +146,7 @@ const Layout = ({
         <Route path="/my-orders" element={<MyOrders />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
+        <Route path="/item/:id" element={<ItemDetails />} />
         {/* <Route path="/payment-success" element={<KhaltiVerify />} /> */}
         {/*  Protected Route: Only Authenticated Users */}
         <Route

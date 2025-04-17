@@ -44,6 +44,8 @@ const createOrder = async (req, res) => {
       totalPrice,
       contact,
       address,
+      paymentMethod: "Cash on Delivery",
+      paymentStatus: "Pending",
     });
 
     await newOrder.save();
@@ -145,6 +147,16 @@ const updateOrderStatus = async (req, res) => {
     }
 
     order.status = status;
+
+    //  Automatically mark as Paid if status is Delivered (for both COD and Khalti)
+    if (
+      (order.paymentMethod === "Cash on Delivery" ||
+        order.paymentMethod === "Khalti") &&
+      status === "Delivered"
+    ) {
+      order.paymentStatus = "Paid";
+    }
+
     await order.save();
     res.status(200).json({ message: "Order status updated", order });
   } catch (error) {

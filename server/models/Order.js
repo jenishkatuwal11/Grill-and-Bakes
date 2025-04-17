@@ -23,6 +23,12 @@ const orderSchema = new mongoose.Schema(
     contact: { type: String, required: true },
     address: { type: String, required: true },
     paymentMethod: { type: String, default: "Cash on Delivery" },
+    paymentStatus: {
+      type: String,
+      enum: ["Pending", "Paid"],
+      default: "Pending",
+    },
+
     status: {
       type: String,
       enum: ["Out for Delivery", "Preparing", "Delivered", "Canceled"],
