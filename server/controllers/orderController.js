@@ -35,7 +35,6 @@ const createOrder = async (req, res) => {
         customizations: item.customizations || {}, //store customizations
       };
     });
-    console.log("Item to be added to order:", enrichedItems); // Debugging line
 
     // Create the order with enriched items
     const newOrder = new Order({
