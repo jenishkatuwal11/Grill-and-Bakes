@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { registerUser } from "../../services/authService";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PropTypes from "prop-types";
 
 const Register = ({ isOpen, onClose, switchMode }) => {
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -47,19 +50,24 @@ const Register = ({ isOpen, onClose, switchMode }) => {
     } else {
       setErrors({});
       try {
-        await registerUser({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        });
+        await registerUser(
+          {
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+          },
+          dispatch
+        );
         setSuccessMessage("You have successfully registered!");
         setTimeout(() => {
           handleClose();
           switchMode();
         }, 2000);
       } catch (error) {
+        console.error("Registration error:", error);
         const errorMessage =
           error.response?.data?.message ||
+          error.message ||
           "Registration failed. Please try again.";
         if (errorMessage.includes("Email")) {
           setErrors({ email: errorMessage });
@@ -249,7 +257,7 @@ const Register = ({ isOpen, onClose, switchMode }) => {
 Register.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  switchMode: PropTypes.func.isRequired, // Required for toggling between Login and Register modals
+  switchMode: PropTypes.func.isRequired,
 };
 
 export default Register;

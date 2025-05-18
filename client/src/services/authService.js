@@ -13,24 +13,10 @@ const extractUserFromToken = (token) => {
 };
 
 //  Register User
-export const registerUser = async (userData, dispatch) => {
+export const registerUser = async (userData) => {
   try {
     const response = await API.post("/auth/register", userData);
-
-    const { token } = response.data;
-
-    if (token) {
-      const user = extractUserFromToken(token);
-
-      //  Store token and user data in localStorage
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("userData", JSON.stringify({ user }));
-
-      //  Dispatch user to Redux
-      dispatch(setUser({ user, token }));
-    }
-
-    return response.data;
+    return response.data; // ✅ Don't auto-login
   } catch (error) {
     console.error("Error in registerUser:", error);
     throw error.response?.data || { message: "Registration failed" };
