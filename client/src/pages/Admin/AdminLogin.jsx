@@ -31,16 +31,16 @@ const AdminLogin = () => {
 
       const { user, adminToken } = response.data;
 
-      // ✅ Store admin user in Redux (No more localStorage)
+      //  Store admin user in Redux (No more localStorage)
       dispatch(setUser({ user, token: adminToken }));
 
-      // ✅ Save to localStorage
+      //  Save to localStorage
       localStorage.setItem("adminToken", adminToken);
       localStorage.setItem("adminData", JSON.stringify({ user }));
 
       console.log("Admin Login Success:", user); // Debugging log
 
-      // ✅ Redirect to admin dashboard
+      //  Redirect to admin dashboard
       navigate("/admin/dashboard");
     } catch (err) {
       setError(err.messag);

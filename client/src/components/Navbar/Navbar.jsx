@@ -55,7 +55,7 @@ const Navbar = ({ toggleLoginModal }) => {
     }
   };
 
-  // 🔍 Handle Enter key press
+  //  Handle Enter key press
   const handleSearchKeyPress = async (e) => {
     if (e.key === "Enter") {
       try {
@@ -118,7 +118,7 @@ const Navbar = ({ toggleLoginModal }) => {
           </li>
         </ul>
 
-        {/* 🔍 Search Input */}
+        {/*  Search Input */}
         <div className="relative">
           <div className="flex items-center border border-dark-brown focus-within:border-maroon rounded-full px-4 lg:px-6 w-64 lg:w-80 transition-all">
             <input
@@ -134,7 +134,7 @@ const Navbar = ({ toggleLoginModal }) => {
             <IoIosSearch className="text-maroon w-6 h-6 lg:w-7 lg:h-10 ml-2 lg:ml-4" />
           </div>
 
-          {/* ⬇️ Search Results Dropdown */}
+          {/*  Search Results Dropdown */}
           {showDropdown && (
             <div className="absolute top-full left-0 mt-2 w-full max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg z-20">
               {searchResults.length === 0 ? (

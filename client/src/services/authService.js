@@ -16,7 +16,7 @@ const extractUserFromToken = (token) => {
 export const registerUser = async (userData) => {
   try {
     const response = await API.post("/auth/register", userData);
-    return response.data; // ✅ Don't auto-login
+    return response.data; //  Don't auto-login
   } catch (error) {
     console.error("Error in registerUser:", error);
     throw error.response?.data || { message: "Registration failed" };

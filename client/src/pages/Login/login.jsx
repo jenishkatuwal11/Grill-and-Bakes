@@ -46,7 +46,7 @@ const Login = ({ isOpen, onClose, switchMode }) => {
         password: formData.password,
       });
 
-      // ✅ Store JWT token in localStorage
+      //  Store JWT token in localStorage
       localStorage.setItem("authToken", response.data.token);
 
       //  Dispatch user data to Redux

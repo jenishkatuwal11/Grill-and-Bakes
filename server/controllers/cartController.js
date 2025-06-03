@@ -29,7 +29,7 @@ const addItemToCart = async (req, res) => {
       price,
       img,
       quantity = 1,
-      customizations = {}, // ✅ Destructure this
+      customizations = {}, // Destructure this
     } = req.body;
 
     let cart = await Cart.findOne({ userId: req.user.id });
@@ -53,7 +53,7 @@ const addItemToCart = async (req, res) => {
         price,
         quantity,
         img,
-        customizations, // ✅ Save customizations
+        customizations, //  Save customizations
       });
     }
 

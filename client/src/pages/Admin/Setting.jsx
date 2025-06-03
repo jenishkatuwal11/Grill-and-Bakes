@@ -25,7 +25,7 @@ const Setting = () => {
 
   // Handle Save Changes
   const handleSaveChanges = () => {
-    alert("Settings Saved Successfully! ✅");
+    alert("Settings Saved Successfully! ");
   };
 
   // Handle Reset to Default

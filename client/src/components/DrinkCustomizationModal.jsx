@@ -197,6 +197,8 @@ const DrinkCustomizationModal = ({ drink, onClose, onConfirm }) => {
               "Crushed caramel toffee bits",
               "Chocolate chips",
               "Cinnamon dust",
+              "Villa bean sprinkles",
+              "Caramel drizzle",
             ]}
           />
         </>

@@ -110,7 +110,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
             </h4>
             <div className="border rounded-md overflow-hidden">
               {order.items.map((item, index) => {
-                console.log("Item details in modal:", item); // ✅ Debugging line
+                console.log("Item details in modal:", item); // Debugging line
                 return (
                   <div
                     key={index}
