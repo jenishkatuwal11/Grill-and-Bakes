@@ -1,5 +1,5 @@
 import Footer from "../../components/Footer/Footer";
-import mobileAppGif from "../../assets/video/MobileApp.gif";
+import mobileAppGif from "../../assets/Video/MobileApp.gif";
 
 const MobileAppPage = () => {
   return (
