@@ -17,7 +17,15 @@ const contactRoutes = require("./routes/contactRoutes");
 const app = express();
 
 // app.use(cors());
-app.use(cors({ origin: "http://localhost:5173", credentials: true })); // Allow requests from the client
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://grill-and-bakes-restaurant.onrender.com",
+    ],
+    credentials: true,
+  })
+); // Allow requests from the client
 app.use(bodyParser.json());
 
 app.use("/uploads", express.static("uploads"));
