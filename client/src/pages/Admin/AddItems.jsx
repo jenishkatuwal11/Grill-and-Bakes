@@ -28,7 +28,9 @@ const AddItems = ({ updateHomepage }) => {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get("http://localhost:8001/api/items");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/items`
+      );
       setItems(response.data.items || []);
       if (updateHomepage) updateHomepage();
     } catch (error) {
@@ -61,14 +63,18 @@ const AddItems = ({ updateHomepage }) => {
 
       if (editId) {
         await axios.put(
-          `http://localhost:8001/api/items/update/${editId}`,
+          `${import.meta.env.VITE_API_URL}/api/items/update/${editId}`,
           formData,
           { headers }
         );
       } else {
-        await axios.post("http://localhost:8001/api/items/add", formData, {
-          headers,
-        });
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/items/add`,
+          formData,
+          {
+            headers,
+          }
+        );
       }
 
       await fetchItems();
@@ -89,7 +95,7 @@ const AddItems = ({ updateHomepage }) => {
       if (!token) throw new Error("Admin token is missing");
 
       await axios.delete(
-        `http://localhost:8001/api/items/delete/${deleteItemId}`,
+        `${import.meta.env.VITE_API_URL}/api/items/delete/${deleteItemId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -114,7 +120,7 @@ const AddItems = ({ updateHomepage }) => {
     setPreview(
       item.image.startsWith("http")
         ? item.image
-        : `http://localhost:8001${item.image}`
+        : `${import.meta.env.VITE_API_URL}${item.image}`
     );
     setEditId(item._id);
   };
@@ -278,7 +284,7 @@ const AddItems = ({ updateHomepage }) => {
               className="bg-white shadow-md p-5 rounded-lg flex items-center space-x-5 border border-gray-200"
             >
               <img
-                src={`http://localhost:8001${item.image}`}
+                src={`${import.meta.env.VITE_API_URL}${item.image}`}
                 alt={item.name}
                 className="w-20 h-20 object-cover rounded-lg shadow-md"
               />

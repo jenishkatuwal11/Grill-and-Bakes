@@ -26,9 +26,12 @@ const OrderStatus = () => {
       const token = localStorage.getItem("adminToken");
       const headers = { Authorization: `Bearer ${token}` };
 
-      const response = await axios.get(`http://localhost:8001/api/orders`, {
-        headers,
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/orders`,
+        {
+          headers,
+        }
+      );
       setOrders(response.data.orders);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -47,7 +50,7 @@ const OrderStatus = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       await axios.put(
-        `http://localhost:8001/api/orders/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/orders/${id}`,
         { status: newStatus },
         { headers }
       );

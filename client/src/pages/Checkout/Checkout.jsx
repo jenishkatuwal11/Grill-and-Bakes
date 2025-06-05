@@ -4,6 +4,7 @@ import { clearCart } from "../../redux/slices/cartSlice";
 import { placeOrder } from "../../redux/slices/orderSlice";
 import { useNavigate } from "react-router-dom";
 import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const Checkout = () => {
   const dispatch = useDispatch();
@@ -56,7 +57,7 @@ const Checkout = () => {
 
     //  Khalti Payment Flow
     if (userInfo.paymentMethod === "Khalti") {
-      const returnUrl = `http://localhost:5173/payment-success`;
+      const returnUrl = `${window.location.origin}/payment-success`;
 
       //  Store order data in localStorage instead of URL
       localStorage.setItem("pendingOrder", JSON.stringify(orderData));
@@ -68,7 +69,7 @@ const Checkout = () => {
 
       try {
         const response = await fetch(
-          "http://localhost:8001/api/payment/khalti/initiate",
+          `${API_BASE_URL}/api/payment/khalti/initiate`,
           {
             method: "POST",
             headers: {

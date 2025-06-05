@@ -44,7 +44,7 @@ const PaymentSuccess = () => {
 
       try {
         const verifyRes = await fetch(
-          "http://localhost:8001/api/payment/khalti/verify",
+          `${import.meta.env.VITE_API_URL}/api/payment/khalti/verify`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

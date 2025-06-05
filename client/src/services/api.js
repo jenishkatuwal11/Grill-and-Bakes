@@ -2,7 +2,7 @@ import axios from "axios";
 import { logoutUser } from "./authService"; // Ensure logout clears expired tokens
 
 const API = axios.create({
-  baseURL: "http://localhost:8001/api",
+  baseURL: import.meta.env.VITE_API_URL + "/api",
   withCredentials: true, //  Allow cookies (if needed)
 });
 

@@ -24,7 +24,9 @@ const YourDrink = () => {
 
   const fetchDrinks = async () => {
     try {
-      const response = await axios.get("http://localhost:8001/api/items");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/items`
+      );
       if (Array.isArray(response.data.items)) {
         setDrinks(response.data.items);
       } else {
@@ -93,7 +95,7 @@ const YourDrink = () => {
                       <img
                         src={
                           drink.image.startsWith("/")
-                            ? `http://localhost:8001${drink.image}`
+                            ? `${import.meta.env.VITE_API_URL}${drink.image}`
                             : drink.image
                         }
                         alt={drink.name}

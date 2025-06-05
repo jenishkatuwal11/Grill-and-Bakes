@@ -14,7 +14,7 @@ const ActiveUsers = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await axios.get(
-        `http://localhost:8001/api/users?page=${currentPage}`,
+        `${import.meta.env.VITE_API_URL}/api/users?page=${currentPage}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -34,7 +34,7 @@ const ActiveUsers = () => {
     try {
       const token = localStorage.getItem("adminToken");
       await axios.put(
-        `http://localhost:8001/api/users/toggle/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/users/toggle/${id}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },

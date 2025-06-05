@@ -101,7 +101,7 @@ const CartModal = ({ isOpen, onClose }) => {
                     src={
                       item.img
                         ? item.img.startsWith("/")
-                          ? `http://localhost:8001${item.img}`
+                          ? `${import.meta.env.VITE_API_URL}${item.img}`
                           : item.img
                         : "fallback-image.jpg"
                     }

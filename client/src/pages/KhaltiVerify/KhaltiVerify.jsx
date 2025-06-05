@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { clearCart } from "../../redux/slices/cartSlice";
 import { placeOrder } from "../../redux/slices/orderSlice";
 import OrderSuccessModal from "../../components/OrderSuccessModal/OrderSuccessModal";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const KhaltiVerify = () => {
   const dispatch = useDispatch();
@@ -31,7 +32,7 @@ const KhaltiVerify = () => {
       try {
         // Step 1: Verify Khalti Payment
         const verifyRes = await fetch(
-          "http://localhost:8001/api/payment/khalti/verify",
+          `${API_BASE_URL}/api/payment/khalti/verify`,
           {
             method: "POST",
             headers: {

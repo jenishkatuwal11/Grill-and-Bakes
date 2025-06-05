@@ -25,7 +25,7 @@ const MyOrders = () => {
       try {
         const token = localStorage.getItem("authToken");
         const response = await axios.get(
-          `http://localhost:8001/api/orders/user/${user.id}`,
+          `${import.meta.env.VITE_API_URL}/api/orders/user/${user.id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -322,7 +322,9 @@ const MyOrders = () => {
                           <img
                             src={
                               item.product?.image
-                                ? `http://localhost:8001${item.product.image}`
+                                ? `${import.meta.env.VITE_API_URL}${
+                                    item.product.image
+                                  }`
                                 : "/fallback-image.jpg"
                             }
                             alt={item.product?.name || "Item"}

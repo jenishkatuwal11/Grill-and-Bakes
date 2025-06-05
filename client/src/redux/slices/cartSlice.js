@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // Get Auth Token
 const getAuthToken = () => localStorage.getItem("authToken") || null;
@@ -47,7 +48,7 @@ export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("http://localhost:8001/api/cart", {
+      const response = await axios.get(`${BASE_URL}/cart`, {
         headers: { Authorization: `Bearer ${getAuthToken()}` },
         withCredentials: true,
       });
@@ -74,7 +75,7 @@ export const addToCart = createAsyncThunk(
           : item.price + extraCost;
 
       const response = await axios.post(
-        "http://localhost:8001/api/cart/add",
+        `${BASE_URL}/cart/add`,
         {
           itemId: item._id,
           name: item.name,
@@ -102,7 +103,7 @@ export const increaseQuantity = createAsyncThunk(
   async (itemId, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `http://localhost:8001/api/cart/increase/${itemId}`,
+        `${BASE_URL}/cart/increase/${itemId}`,
         {},
         {
           headers: { Authorization: `Bearer ${getAuthToken()}` },
@@ -124,7 +125,7 @@ export const decreaseQuantity = createAsyncThunk(
   async (itemId, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `http://localhost:8001/api/cart/decrease/${itemId}`,
+        `${BASE_URL}/cart/decrease/${itemId}`,
         {},
         {
           headers: { Authorization: `Bearer ${getAuthToken()}` },
@@ -145,13 +146,10 @@ export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async (itemId, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:8001/api/cart/remove/${itemId}`,
-        {
-          headers: { Authorization: `Bearer ${getAuthToken()}` },
-          withCredentials: true,
-        }
-      );
+      const response = await axios.delete(`${BASE_URL}/cart/remove/${itemId}`, {
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error removing item");
@@ -164,13 +162,10 @@ export const clearCart = createAsyncThunk(
   "cart/clearCart",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(
-        "http://localhost:8001/api/cart/clear",
-        {
-          headers: { Authorization: `Bearer ${getAuthToken()}` },
-          withCredentials: true,
-        }
-      );
+      const response = await axios.delete(`${BASE_URL}/cart/clear`, {
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error clearing cart");

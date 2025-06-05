@@ -48,7 +48,9 @@ const Reports = () => {
         }
 
         const res = await fetch(
-          `http://localhost:8001/api/admin/reports/filter?${params.toString()}`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/admin/reports/filter?${params.toString()}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("adminToken")}`,

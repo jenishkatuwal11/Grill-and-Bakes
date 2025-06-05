@@ -10,6 +10,7 @@ import PropTypes from "prop-types";
 import assets from "../../assets/assets";
 import CartModal from "../CartModal";
 import axios from "axios";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const Navbar = ({ toggleLoginModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -59,7 +60,8 @@ const Navbar = ({ toggleLoginModal }) => {
   const handleSearchKeyPress = async (e) => {
     if (e.key === "Enter") {
       try {
-        const res = await axios.get("http://localhost:8001/api/items");
+        const res = await axios.get(`${API_BASE_URL}/api/items`);
+
         const allItems = res.data.items || [];
 
         const filtered = allItems.filter((item) =>

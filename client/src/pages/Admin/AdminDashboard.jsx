@@ -40,11 +40,14 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const res = await fetch("http://localhost:8001/api/admin/stats", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-          },
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/admin/stats`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+            },
+          }
+        );
         const data = await res.json();
         setDashboardData({
           ...data.stats,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import Footer from "../../components/Footer/Footer";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ const ContactUs = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8001/api/contact",
+        `${API_BASE_URL}/api/contact`,
         formData
       );
       setStatus({ success: true, message: response.data.message });

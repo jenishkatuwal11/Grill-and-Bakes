@@ -11,6 +11,7 @@ import Slider from "react-slick";
 import { FaPlus, FaMinus, FaTimes } from "react-icons/fa";
 import assets from "../../assets/assets";
 import Footer from "../../components/Footer/Footer";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ const HomePage = () => {
 
   const fetchMeals = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:8001/api/items");
+      const response = await axios.get(`${API_BASE_URL}/api/items`);
 
       const allItems = response.data.items || [];
 
@@ -180,7 +181,7 @@ const HomePage = () => {
                   <img
                     src={
                       item.image.startsWith("/")
-                        ? `http://localhost:8001${item.image}`
+                        ? `${API_BASE_URL}${item.image}`
                         : item.image
                     }
                     alt={item.name}
