@@ -1,5 +1,5 @@
 import Footer from "../../components/Footer/Footer";
-import mobileAppGif from "../../assets/video/MobileApp.gif"; // Adjust the path based on your folder structure
+import mobileAppGif from "../../assets/video/MobileApp.gif";
 
 const MobileAppPage = () => {
   return (
